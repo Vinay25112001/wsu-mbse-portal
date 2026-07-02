@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MBSE &amp; SysML — Wright State University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    /*
+     * WSU Light Theme — aligned to wright.edu
+     * ─────────────────────────────────────────
+     * Topbar/Nav  : #026937 (WSU Green) — white text on green
+     * Sidebar     : #f4f5f6 light grey — #1a1a1a text
+     * Content     : #ffffff white — #1a1a1a text
+     * Tab bar     : #ffffff white — green active underline
+     * Cards       : #ffffff white, #e8eaec border
+     * Accent      : #026937 WSU Green (buttons, rules, active states)
+     * Gold        : #C9A227 (score display, equations only)
+     * Body text   : #333333
+     * Muted text  : #6b7280
+     */
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #f4f5f6;
+      color: #1a1a1a;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f4f5f6; }
+    ::-webkit-scrollbar-thumb { background: #c8ccd0; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #026937; }
+
+    /* ── Drop cap ──────────────────────────────────────────────────── */
+    .drop-cap-first::first-letter {
+      float: left;
+      font-family: 'Playfair Display', serif;
+      font-size: 4.2rem;
+      font-weight: 900;
+      line-height: 0.82;
+      margin-right: 0.1em;
+      margin-top: 0.05em;
+      color: #026937;
+    }
+
+    /* ── App Shell ─────────────────────────────────────────────────── */
+    #app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: #f4f5f6;
+    }
+
+    /* ── Topbar — WSU Green bar, like wright.edu nav ───────────────── */
+    #topbar {
+      flex: 0 0 auto;
+      height: 56px;
+      background: #026937;
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+    .logo-mark {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffffff;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .logo-sub {
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .divider-v {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      padding: 0.22rem 0.6rem;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* ── Workspace ─────────────────────────────────────────────────── */
+    #workspace { flex: 1 1 0; display: flex; overflow: hidden; }
+
+    /* ── Sidebar ───────────────────────────────────────────────────── */
+    #sidebar {
+      flex: 0 0 252px;
+      background: #ffffff;
+      border-right: 1px solid #e2e4e7;
+      overflow-y: auto;
+      padding: 0.5rem 0 1.5rem;
+    }
+    .sidebar-section-hdr {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.57rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #9ca3af;
+      text-transform: uppercase;
+      padding: 1rem 1rem 0.3rem;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .sidebar-item:hover {
+      background: #f0faf4;
+      border-left-color: #a7d4b8;
+    }
+    .sidebar-item.active {
+      background: #eef7f2;
+      border-left-color: #026937;
+    }
+    .sidebar-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.59rem;
+      font-weight: 600;
+      color: #c8ccd0;
+      padding-top: 0.14rem;
+      flex-shrink: 0;
+    }
+    .sidebar-item.loaded .sidebar-num { color: #9ca3af; }
+    .sidebar-item.active  .sidebar-num { color: #026937; }
+    .sidebar-title {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      line-height: 1.45;
+    }
+    .sidebar-item.loaded .sidebar-title { color: #6b7280; }
+    .sidebar-item.active  .sidebar-title { color: #1a1a1a; font-weight: 500; }
+    .sidebar-badge {
+      margin-left: auto;
+      font-size: 0.52rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #eef7f2;
+      color: #026937;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Main panel ────────────────────────────────────────────────── */
+    #main-panel { flex: 1 1 0; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Tab bar ───────────────────────────────────────────────────── */
+    #tab-bar {
+      flex: 0 0 auto;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e4e7;
+      display: flex;
+      padding: 0 1.5rem;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 0 1.1rem;
+      height: 44px;
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: #9ca3af;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.14s, border-color 0.14s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: transparent;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+    .tab-btn:hover { color: #374151; }
+    .tab-btn.active { color: #026937; border-bottom-color: #026937; font-weight: 600; }
+    .tab-icon { font-size: 0.85rem; }
+
+    /* ── Content area ──────────────────────────────────────────────── */
+    #content-area { flex: 1 1 0; overflow-y: auto; padding: 2rem 2.5rem; background: #f4f5f6; }
+
+    /* ── Dropdown ──────────────────────────────────────────────────── */
+    .dropdown-wrap { position: relative; }
+    .dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 5px;
+      padding: 0.38rem 0.85rem;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.14s;
+      white-space: nowrap;
+      min-width: 200px;
+      max-width: 300px;
+    }
+    .dropdown-btn:hover { background: rgba(255,255,255,0.22); }
+    .dropdown-btn .chevron { transition: transform 0.18s; margin-left: auto; flex-shrink: 0; }
+    .dropdown-btn.open .chevron { transform: rotate(180deg); }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 340px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 6px;
+      z-index: 9999;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .dropdown-menu.open { display: block; }
+    .dropdown-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.55rem 0.9rem;
+      cursor: pointer;
+      transition: background 0.1s;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: #f0faf4; }
+    .dropdown-item.active { background: #eef7f2; }
+    .dropdown-item .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #c8ccd0;
+      font-weight: 600;
+      padding-top: 0.12rem;
+      flex-shrink: 0;
+    }
+    .dropdown-item.active .num { color: #026937; }
+    .dropdown-item .title-text { font-size: 0.73rem; color: #6b7280; line-height: 1.45; }
+    .dropdown-item.active .title-text { color: #1a1a1a; font-weight: 500; }
+
+    /* ── Lecture content ───────────────────────────────────────────── */
+    .lecture-hdr {
+      border-bottom: 1px solid #e2e4e7;
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .lecture-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #026937;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .lecture-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.2;
+      margin-bottom: 0.85rem;
+    }
+    .lecture-meta { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .meta-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      background: #f3f4f6;
+      border: 1px solid #e2e4e7;
+      color: #6b7280;
+    }
+    .meta-chip.gold {
+      background: #fefce8;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .section-hdr {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      border-left: 3px solid #026937;
+      padding-left: 0.75rem;
+      margin: 2.25rem 0 0.85rem;
+    }
+    .subsection-hdr {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 1.5rem 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .subsection-hdr::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+      background: #026937;
+      flex-shrink: 0;
+    }
+    .body-text {
+      color: #374151;
+      line-height: 1.85;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .callout-box {
+      background: #f9fafb;
+      border: 1px solid #e2e4e7;
+      border-left: 3px solid #026937;
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .callout-box.gold-box {
+      background: #fffbeb;
+      border-color: #fde68a;
+      border-left-color: #d97706;
+    }
+    .callout-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #026937;
+    }
+    .callout-box.gold-box .callout-label { color: #92400e; }
+    .callout-content { color: #374151; font-size: 0.845rem; line-height: 1.78; }
+
+    .equation-block {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 0.85rem 1.25rem;
+      margin: 1rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #C9A227;
+      overflow-x: auto;
+    }
+
+    .reference-list { list-style: none; padding: 0; margin: 0; }
+    .reference-list li {
+      font-size: 0.775rem;
+      color: #9ca3af;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+    .reference-list li::before { content: '↗'; color: #026937; flex-shrink: 0; }
+
+    .obj-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #eef7f2;
+      border: 1px solid #a7d4b8;
+      border-radius: 4px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      color: #026937;
+      margin: 0.2rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.6rem;
+      margin: 1.25rem 0;
+    }
+    .info-cell {
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 6px;
+      padding: 0.75rem;
+    }
+    .info-cell-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: #9ca3af;
+      margin-bottom: 0.3rem;
+    }
+    .info-cell-val { font-size: 0.8rem; font-weight: 600; color: #374151; }
+
+    /* ── Schema visualizer ─────────────────────────────────────────── */
+    .schema-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.85rem;
+    }
+    .schema-card {
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 7px;
+      padding: 1.05rem;
+      transition: border-color 0.14s, box-shadow 0.14s;
+      cursor: pointer;
+    }
+    .schema-card:hover {
+      border-color: #a7d4b8;
+      box-shadow: 0 2px 8px rgba(2,105,55,0.08);
+    }
+    .schema-card.active {
+      border-color: #026937;
+      background: #eef7f2;
+    }
+    .schema-card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #026937;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.35rem;
+    }
+    .schema-card-name { font-size: 0.86rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.3rem; }
+    .schema-card-desc { font-size: 0.72rem; color: #9ca3af; line-height: 1.5; }
+    .sysml-symbol-svg {
+      width: 100%;
+      margin: 1.25rem 0;
+      border-radius: 6px;
+      background: #1a1a1a;
+      border: 1px solid #e2e4e7;
+      overflow: hidden;
+    }
+    .symbol-detail-panel {
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1.1rem;
+    }
+
+    /* ── Playground ────────────────────────────────────────────────── */
+    .playground-canvas {
+      border: 1px solid #e2e4e7 !important;
+      border-radius: 8px !important;
+    }
+    .pg-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .pg-tool-btn {
+      padding: 0.35rem 0.85rem;
+      font-size: 0.71rem;
+      font-weight: 500;
+      border-radius: 5px;
+      border: 1px solid #e2e4e7;
+      background: #ffffff;
+      color: #374151;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .pg-tool-btn:hover { background: #f0faf4; border-color: #a7d4b8; color: #026937; }
+    .pg-tool-btn.danger {
+      border-color: #fca5a5;
+      color: #dc2626;
+      background: #fff5f5;
+    }
+    .pg-tool-btn.danger:hover { background: #fee2e2; }
+    .pg-block-inner {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .pg-block-inner.selected-block { border-color: #026937; box-shadow: 0 0 0 2px rgba(2,105,55,0.15); }
+    .pg-block-hdr {
+      background: #f3f4f6;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.58rem;
+      color: #9ca3af;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .pg-block-name { padding: 0.42rem 0.7rem; color: #1a1a1a; font-size: 0.73rem; font-weight: 600; }
+    .pg-block-props { padding: 0 0.7rem 0.42rem; color: #9ca3af; font-size: 0.63rem; }
+    .pg-conn-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #026937; border: 2px solid #fff;
+      position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+      cursor: crosshair; transition: background 0.12s; z-index: 5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .pg-conn-btn:hover { background: #C9A227; }
+
+    /* ── Quiz ──────────────────────────────────────────────────────── */
+    .quiz-progress-bar {
+      height: 3px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      background: #026937;
+      border-radius: 2px;
+      transition: width 0.35s;
+    }
+    .quiz-question-card {
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 8px;
+      padding: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .quiz-q-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #9ca3af;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.55rem;
+    }
+    .quiz-q-text { font-size: 0.875rem; color: #111827; font-weight: 500; margin-bottom: 1rem; line-height: 1.6; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+      margin-bottom: 0.45rem;
+    }
+    .quiz-option:hover { border-color: #a7d4b8; background: #f0faf4; }
+    .quiz-option.selected { border-color: #026937; background: #eef7f2; }
+    .quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+    .quiz-option.incorrect { border-color: #dc2626; background: #fef2f2; }
+    .quiz-option.correct-answer { border-color: #86efac; background: #f0fdf4; }
+    .quiz-option-letter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      font-weight: 700;
+      width: 20px; height: 20px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      color: #6b7280;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .quiz-option.selected .quiz-option-letter { background: #a7d4b8; color: #026937; }
+    .quiz-option.correct .quiz-option-letter { background: #bbf7d0; color: #15803d; }
+    .quiz-option.incorrect .quiz-option-letter { background: #fecaca; color: #dc2626; }
+    .quiz-option.correct-answer .quiz-option-letter { background: #bbf7d0; color: #15803d; }
+    .quiz-option-text { font-size: 0.815rem; color: #374151; line-height: 1.5; padding-top: 0.06rem; }
+    .quiz-feedback {
+      font-size: 0.775rem;
+      margin-top: 0.7rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 5px;
+      line-height: 1.55;
+    }
+    .quiz-feedback.correct-fb   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .quiz-feedback.incorrect-fb { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .quiz-submit-btn {
+      padding: 0.6rem 1.75rem;
+      background: #026937;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.14s;
+    }
+    .quiz-submit-btn:hover { background: #038048; }
+    .quiz-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .quiz-score-banner {
+      text-align: center;
+      padding: 2.5rem;
+      background: #ffffff;
+      border: 1px solid #e2e4e7;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .quiz-score-pct {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      color: #026937;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .quiz-score-label { font-size: 0.75rem; color: #9ca3af; letter-spacing: 0.1em; text-transform: uppercase; }
+    .grade-letter {
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 0.28rem 0.75rem;
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Assignment / Rubric ───────────────────────────────────────── */
+    .rubric-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      border-radius: 2px;
+      background: #e5e7eb;
+      outline: none;
+    }
+    .rubric-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #026937;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .rubric-slider::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #026937;
+      cursor: pointer;
+      border: 2px solid #fff;
+    }
+
+    /* ── Loading spinner ───────────────────────────────────────────── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #sidebar { display: none; }
+      .lecture-title { font-size: 1.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-shell">
+
+  <!-- ── TOPBAR ─────────────────────────────────────────────────────── -->
+  <header id="topbar">
+    <!-- Logo -->
+    <div style="display:flex; flex-direction:column; line-height:1.2;">
+      <span class="logo-mark">MBSE &amp; SysML</span>
+      <span class="logo-sub">Wright State University · CECS</span>
+    </div>
+    <div class="divider-v"></div>
+
+    <!-- Lecture Dropdown -->
+    <div class="dropdown-wrap">
+      <button class="dropdown-btn" id="lecture-dropdown-btn" onclick="toggleDropdown()">
+        <span id="dropdown-label">Select Lecture…</span>
+        <svg class="chevron" style="width:12px;height:12px;opacity:0.6;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu" id="lecture-dropdown-menu"></div>
+    </div>
+
+    <!-- Spacer -->
+    <div style="flex:1;"></div>
+
+    <!-- Status Indicators -->
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <div id="load-indicator" style="display:none; align-items:center; gap:0.375rem;">
+        <div class="spinner" style="width:14px;height:14px;border-width:2px;"></div>
+        <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.8);">Loading…</span>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:rgba(255,255,255,0.45);">SysML 1.7 · INCOSE v5</span>
+      <div class="tag-pill">
+        <svg style="width:10px;height:10px;flex-shrink:0;" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12zm1-9H9v4l3.28 1.97.72-1.2-2-1.21V7z"/></svg>
+        30 Lectures
+      </div>
+    </div>
+  </header>
+
+  <!-- ── WORKSPACE ──────────────────────────────────────────────────── -->
+  <div id="workspace">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sidebar-section-hdr">Course Map</div>
+      <div id="sidebar-list"></div>
+    </nav>
+
+    <!-- MAIN PANEL -->
+    <main id="main-panel">
+
+      <!-- TAB BAR -->
+      <div id="tab-bar">
+        <button class="tab-btn active" data-tab="content" onclick="switchTab('content',this)">
+          <span class="tab-icon">📄</span> Lecture Content
+        </button>
+        <button class="tab-btn" data-tab="schema" onclick="switchTab('schema',this)">
+          <span class="tab-icon">🔷</span> Schema Visualizer
+        </button>
+        <button class="tab-btn" data-tab="playground" onclick="switchTab('playground',this)">
+          <span class="tab-icon">🧪</span> SysML Playground
+        </button>
+        <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz',this)">
+          <span class="tab-icon">✅</span> Knowledge Check
+        </button>
+        <button class="tab-btn" data-tab="assignment" onclick="switchTab('assignment',this)">
+          <span class="tab-icon">📋</span> Assignment &amp; Rubric
+        </button>
+      </div>
+
+      <!-- CONTENT AREA -->
+      <div id="content-area">
+        <div id="splash-state">
+          <div style="padding: 5rem 2rem; max-width: 540px; margin: 0 auto;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:#9ca3af; margin-bottom:1.25rem;">Wright State University · College of Engineering &amp; Computer Science</div>
+            <h1 style="font-family:'Playfair Display',serif; font-size:2.6rem; font-weight:900; color:#1a1a1a; line-height:1.15; margin:0 0 1rem;">MBSE &amp;<br>SysML</h1>
+            <p style="color:#6b7280; font-size:0.875rem; line-height:1.75; margin:0 0 2.5rem;">Thirty deep-dive lectures aligned to INCOSE SE Handbook v5 and OMG SysML 1.7. Select a lecture from the sidebar or the dropdown above to begin.</p>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.6rem;">
+              <div style="background:#fff; border:1px solid #e2e4e7; border-radius:6px; padding:0.85rem 0.75rem;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:0.55rem; text-transform:uppercase; letter-spacing:0.13em; color:#9ca3af; margin-bottom:0.35rem;">Lectures</div>
+                <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:#026937; line-height:1;">30</div>
+              </div>
+              <div style="background:#fff; border:1px solid #e2e4e7; border-radius:6px; padding:0.85rem 0.75rem;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:0.55rem; text-transform:uppercase; letter-spacing:0.13em; color:#9ca3af; margin-bottom:0.35rem;">Duration</div>
+                <div style="font-size:0.85rem; font-weight:600; color:#374151;">16 wks</div>
+              </div>
+              <div style="background:#fff; border:1px solid #e2e4e7; border-radius:6px; padding:0.85rem 0.75rem;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:0.55rem; text-transform:uppercase; letter-spacing:0.13em; color:#9ca3af; margin-bottom:0.35rem;">Standard</div>
+                <div style="font-size:0.85rem; font-weight:600; color:#374151;">SysML 1.7</div>
+              </div>
+              <div style="background:#fff; border:1px solid #e2e4e7; border-radius:6px; padding:0.85rem 0.75rem;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:0.55rem; text-transform:uppercase; letter-spacing:0.13em; color:#9ca3af; margin-bottom:0.35rem;">Handbook</div>
+                <div style="font-size:0.85rem; font-weight:600; color:#374151;">INCOSE v5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab panels (hidden until lecture loaded) -->
+        <div id="tab-content"  class="tab-panel" style="display:none"></div>
+        <div id="tab-schema"   class="tab-panel" style="display:none"></div>
+        <div id="tab-playground" class="tab-panel" style="display:none"></div>
+        <div id="tab-quiz"     class="tab-panel" style="display:none"></div>
+        <div id="tab-assignment" class="tab-panel" style="display:none"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     APPLICATION ENGINE
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────────────────────────────
+   1. COURSE REGISTRY
+   Stores metadata for all 30 lectures.
+   Lecture data files (lecture1.js, lecture2.js …) populate
+   window.MBSE_COURSE_DATA[id] when they are loaded.
+   ─────────────────────────────────────────────────────────────────────*/
+window.MBSE_COURSE_DATA = window.MBSE_COURSE_DATA || {};
+
+const COURSE_REGISTRY = [
+  { id: 1,  week: 1,  unit: 'Foundations',   title: 'Foundations of Systems Architecture & The Mathematical Imperative for MBSE' },
+  { id: 2,  week: 2,  unit: 'Foundations',   title: 'Systems Thinking, Stakeholder Analysis & Conceptual Architecture' },
+  { id: 3,  week: 3,  unit: 'Foundations',   title: 'Requirements Engineering for MBSE' },
+  { id: 4,  week: 4,  unit: 'Foundations',   title: 'MBSE Workflow, Method & Repository Discipline' },
+  { id: 5,  week: 5,  unit: 'Structure',     title: 'Package Diagrams & Model Architecture' },
+  { id: 6,  week: 6,  unit: 'Structure',     title: 'Block Definition Diagrams' },
+  { id: 7,  week: 7,  unit: 'Structure',     title: 'Internal Block Diagrams & Interface Modeling' },
+  { id: 8,  week: 8,  unit: 'Structure',     title: 'Requirements Diagrams & Traceability Engineering' },
+  { id: 9,  week: 9,  unit: 'Behavior',      title: 'Use Case Diagrams & Operational Behavior' },
+  { id: 10, week:10,  unit: 'Behavior',      title: 'Activity Diagrams & Functional Flow' },
+  { id: 11, week:11,  unit: 'Behavior',      title: 'Sequence Diagrams & Interaction Design' },
+  { id: 12, week:12,  unit: 'Behavior',      title: 'State Machine Diagrams & Lifecycle Behavior' },
+  { id: 13, week:13,  unit: 'Analysis',      title: 'Parametric Diagrams & Engineering Analysis' },
+  { id: 14, week:14,  unit: 'Analysis',      title: 'MATLAB/Simulink Integration with SysML Parametrics' },
+  { id: 15, week:15,  unit: 'Analysis',      title: 'Trade Study Architecture & Multi-Criteria Decision Analysis' },
+  { id: 16, week:16,  unit: 'Analysis',      title: 'Design Space Exploration & Sensitivity Analysis' },
+  { id: 17, week:17,  unit: 'Verification',  title: 'Verification & Validation Planning in MBSE' },
+  { id: 18, week:18,  unit: 'Verification',  title: 'ARP 4761A Safety Analysis & Fault-Propagation Modeling' },
+  { id: 19, week:19,  unit: 'Verification',  title: 'FHA, FTA & FMEA Integration with SysML' },
+  { id: 20, week:20,  unit: 'Verification',  title: 'Requirements Verification Matrix & Evidence Chains' },
+  { id: 21, week:21,  unit: 'Digital Thread','title': 'Digital Thread Architecture & Model Continuity' },
+  { id: 22, week:22,  unit: 'Digital Thread','title': 'SysML v2 Transition: Concepts & Migration Strategy' },
+  { id: 23, week:23,  unit: 'Digital Thread','title': 'MBSE Tool Ecosystems: Cameo, Rhapsody & Papyrus' },
+  { id: 24, week:24,  unit: 'Digital Thread','title': 'Model Governance, Baseline Management & Version Control' },
+  { id: 25, week:25,  unit: 'Capstone',      title: 'Hybrid eVTOL Tilt-Rotor Architecture Case Study — Part I' },
+  { id: 26, week:26,  unit: 'Capstone',      title: 'Hybrid eVTOL Tilt-Rotor Architecture Case Study — Part II' },
+  { id: 27, week:27,  unit: 'Capstone',      title: 'Autonomous Drone Swarm Systems Architecture' },
+  { id: 28, week:28,  unit: 'Capstone',      title: 'Small Satellite MBSE: Power, ADCS & Communications' },
+  { id: 29, week:29,  unit: 'Capstone',      title: 'Human-Autonomy Teaming & Cognitive Safety Architecture' },
+  { id: 30, week:30,  unit: 'Capstone',      title: 'Capstone Defense: MBSE Portfolio Review & Digital Engineering' },
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   2. STATE
+   ─────────────────────────────────────────────────────────────────────*/
+let STATE = {
+  activeLectureId: null,
+  activeTab: 'content',
+  loadedFiles: new Set(),
+  quizState: {},           // keyed by lectureId
+  playgroundState: {},     // keyed by lectureId
+  assignmentState: {},     // keyed by lectureId
+};
+
+/* ─────────────────────────────────────────────────────────────────────
+   3. BOOT — build sidebar & dropdown from registry
+   ─────────────────────────────────────────────────────────────────────*/
+(function boot() {
+  buildSidebar();
+  buildDropdown();
+
+  // Auto-load lecture 1 if its data file is already present
+  if (window.MBSE_COURSE_DATA[1]) {
+    loadLecture(1);
+  }
+})();
+
+function buildSidebar() {
+  const container = document.getElementById('sidebar-list');
+  let currentUnit = '';
+  COURSE_REGISTRY.forEach(lec => {
+    if (lec.unit !== currentUnit) {
+      currentUnit = lec.unit;
+      const hdr = document.createElement('div');
+      hdr.className = 'sidebar-section-hdr';
+      hdr.style.marginTop = '0.5rem';
+      hdr.textContent = lec.unit;
+      container.appendChild(hdr);
+    }
+    const item = document.createElement('div');
+    item.className = 'sidebar-item';
+    item.id = `sidebar-item-${lec.id}`;
+    item.onclick = () => handleLectureSelect(lec.id);
+    item.innerHTML = `
+      <span class="sidebar-num num">L${String(lec.id).padStart(2,'0')}</span>
+      <span class="sidebar-title">${lec.title}</span>
+      <span class="sidebar-badge" id="badge-${lec.id}" style="display:none">✓</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildDropdown() {
+  const menu = document.getElementById('lecture-dropdown-menu');
+  COURSE_REGISTRY.forEach(lec => {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item';
+    item.id = `dd-item-${lec.id}`;
+    item.onclick = () => { handleLectureSelect(lec.id); closeDropdown(); };
+    item.innerHTML = `
+      <span class="num">L${String(lec.id).padStart(2,'0')}</span>
+      <span class="title-text">${lec.title}</span>
+    `;
+    menu.appendChild(item);
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   4. DYNAMIC LECTURE LOADER
+   Injects <script src="lectureN.js"> if not already done.
+   Once the script runs, it sets window.MBSE_COURSE_DATA[N].
+   ─────────────────────────────────────────────────────────────────────*/
+function loadLectureFile(id) {
+  return new Promise((resolve, reject) => {
+    if (window.MBSE_COURSE_DATA[id]) { resolve(); return; }
+    if (STATE.loadedFiles.has(id)) {
+      // script tag already injected — poll briefly
+      let attempts = 0;
+      const poll = setInterval(() => {
+        if (window.MBSE_COURSE_DATA[id] || attempts++ > 30) {
+          clearInterval(poll);
+          resolve();
+        }
+      }, 100);
+      return;
+    }
+    STATE.loadedFiles.add(id);
+    const script = document.createElement('script');
+    script.src = `lecture${id}.js`;
+    script.onload = () => resolve();
+    script.onerror = () => {
+      STATE.loadedFiles.delete(id);
+      reject(new Error(`lecture${id}.js not found`));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+async function handleLectureSelect(id) {
+  showLoadIndicator(true);
+  try {
+    await loadLectureFile(id);
+    loadLecture(id);
+  } catch(e) {
+    showNotAvailable(id);
+  } finally {
+    showLoadIndicator(false);
+  }
+}
+
+function showLoadIndicator(on) {
+  const el = document.getElementById('load-indicator');
+  el.style.display = on ? 'flex' : 'none';
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   5. RENDER ENGINE — dispatches to each tab renderer
+   ─────────────────────────────────────────────────────────────────────*/
+function loadLecture(id) {
+  const data = window.MBSE_COURSE_DATA[id];
+  if (!data) return showNotAvailable(id);
+
+  STATE.activeLectureId = id;
+
+  // Hide splash, show panels
+  document.getElementById('splash-state').style.display = 'none';
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  showActiveTabPanel();
+
+  // Update sidebar & dropdown
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+  const si = document.getElementById(`sidebar-item-${id}`);
+  if (si) { si.classList.add('active', 'loaded'); document.getElementById(`badge-${id}`).style.display='flex'; }
+  const di = document.getElementById(`dd-item-${id}`);
+  if (di) di.classList.add('active');
+
+  // Update dropdown button label
+  const reg = COURSE_REGISTRY.find(l => l.id === id);
+  document.getElementById('dropdown-label').textContent = `L${String(id).padStart(2,'0')} · ${reg ? reg.title.slice(0,38)+'…' : ''}`;
+
+  // Render all tabs
+  renderContentTab(data);
+  renderSchemaTab(data);
+  renderPlaygroundTab(data, id);
+  renderQuizTab(data, id);
+  renderAssignmentTab(data, id);
+
+  // Switch to active tab
+  switchTab(STATE.activeTab, document.querySelector(`.tab-btn[data-tab="${STATE.activeTab}"]`));
+}
+
+function showActiveTabPanel() {
+  const panelId = `tab-${STATE.activeTab}`;
+  const panel = document.getElementById(panelId);
+  if (panel) panel.style.display = 'block';
+}
+
+function switchTab(tabName, btn) {
+  STATE.activeTab = tabName;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById(`tab-${tabName}`);
+  if (panel && STATE.activeLectureId) panel.style.display = 'block';
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   6. TAB 1 — LECTURE CONTENT RENDERER
+   ─────────────────────────────────────────────────────────────────────*/
+function renderContentTab(data) {
+  const el = document.getElementById('tab-content');
+  const lec = data.meta;
+  const sections = data.content;
+
+  let html = `
+    <div class="lecture-hdr">
+      <div class="lecture-eyebrow">Lecture ${lec.id} · Week ${lec.week} · ${lec.unit}</div>
+      <h1 class="lecture-title">${lec.title}</h1>
+      <div class="lecture-meta">
+        <span class="meta-chip">⏱ ${lec.duration}</span>
+        <span class="meta-chip">📊 ${lec.difficulty}</span>
+        <span class="meta-chip gold">🎯 ${lec.creditHours} Credit Hours</span>
+        <span class="meta-chip">📚 INCOSE SE Handbook v5</span>
+        <span class="meta-chip">🔷 OMG SysML 1.7</span>
+      </div>
+    </div>
+
+    <!-- Learning Objectives -->
+    <div style="margin-bottom:2rem;">
+      <div class="section-hdr" style="margin-top:0">Learning Objectives</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
+        ${lec.objectives.map(o => `<span class="obj-pill">✓ ${o}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-label">Prerequisites</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.prerequisites||[]).join(', ') || 'None'}</div></div>
+      <div class="info-cell"><div class="info-cell-label">Est. Study Time</div><div class="info-cell-val">${lec.studyHours || '3–4 hrs'}</div></div>
+      <div class="info-cell"><div class="info-cell-label">Tooling</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.tools||[]).join(', ')}</div></div>
+      <div class="info-cell"><div class="info-cell-label">Common Errors</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.commonErrors||['See section notes']).join('; ')}</div></div>
+    </div>
+  `;
+
+  // Render sections
+  sections.forEach((sec, si) => {
+    html += `<div class="section-hdr">${sec.heading}</div>`;
+
+    sec.paragraphs.forEach((para, pi) => {
+      const cls = (si === 0 && pi === 0) ? 'body-text drop-cap-first' : 'body-text';
+      html += `<p class="${cls}">${para}</p>`;
+    });
+
+    if (sec.callout) {
+      const boxCls = sec.callout.type === 'gold' ? 'callout-box gold-box' : 'callout-box';
+      html += `<div class="${boxCls}">
+        <div class="callout-label">${sec.callout.label}</div>
+        <div class="callout-content">${sec.callout.body}</div>
+      </div>`;
+    }
+
+    if (sec.equations && sec.equations.length) {
+      sec.equations.forEach(eq => {
+        html += `<div class="equation-block">${eq}</div>`;
+      });
+    }
+
+    if (sec.subsections && sec.subsections.length) {
+      sec.subsections.forEach(sub => {
+        html += `<div class="subsection-hdr">${sub.title}</div>`;
+        sub.paragraphs.forEach(p => { html += `<p class="body-text">${p}</p>`; });
+        if (sub.callout) {
+          html += `<div class="callout-box ${sub.callout.type==='gold'?'gold-box':''}">
+            <div class="callout-label">${sub.callout.label}</div>
+            <div class="callout-content">${sub.callout.body}</div>
+          </div>`;
+        }
+        if (sub.equations) sub.equations.forEach(eq => { html += `<div class="equation-block">${eq}</div>`; });
+      });
+    }
+  });
+
+  // References
+  if (data.references && data.references.length) {
+    html += `<div class="section-hdr" style="margin-top:2.5rem">Recommended References</div>
+    <ul class="reference-list">
+      ${data.references.map(r => `<li>${r}</li>`).join('')}
+    </ul>`;
+  }
+
+  el.innerHTML = html;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   7. TAB 2 — SCHEMA VISUALIZER RENDERER
+   ─────────────────────────────────────────────────────────────────────*/
+function renderSchemaTab(data) {
+  const el = document.getElementById('tab-schema');
+  const symbols = data.schemaVisualizer || [];
+
+  let html = `
+    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
+      <div class="lecture-eyebrow">Interactive Schema Visualizer</div>
+      <h2 class="lecture-title" style="font-size:1.6rem;">SysML Symbols &amp; Notation Guide</h2>
+      <p class="body-text" style="margin:0">Click any card to expand its full notation reference and visual representation.</p>
+    </div>
+    <div class="schema-grid" id="schema-grid">
+  `;
+
+  symbols.forEach((sym, idx) => {
+    html += `
+      <div class="schema-card" onclick="expandSchemaCard(${idx})" id="schema-card-${idx}">
+        <div class="schema-card-label">${sym.category}</div>
+        <div class="schema-card-name">${sym.name}</div>
+        <div class="schema-card-desc">${sym.shortDesc}</div>
+      </div>
+    `;
+  });
+
+  html += `</div><div id="schema-detail-panel" class="symbol-detail-panel" style="display:none"></div>`;
+  el.innerHTML = html;
+  el._symbols = symbols;
+}
+
+function expandSchemaCard(idx) {
+  const el = document.getElementById('tab-schema');
+  const symbols = el._symbols;
+  const sym = symbols[idx];
+  const panel = document.getElementById('schema-detail-panel');
+
+  document.querySelectorAll('.schema-card').forEach((c,i) => c.classList.toggle('active', i===idx));
+
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:#026937; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:0.35rem;">${sym.category}</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; color:#1a1a1a;">${sym.name}</div>
+      </div>
+      <span class="meta-chip gold">${sym.diagramType}</span>
+    </div>
+    <p class="body-text">${sym.fullDesc}</p>
+    ${sym.svgMarkup ? `<div class="sysml-symbol-svg">${sym.svgMarkup}</div>` : ''}
+    ${sym.notation ? `
+      <div class="subsection-hdr">Notation Rules</div>
+      <ul style="list-style:none; padding:0; margin:0;">
+        ${sym.notation.map(n => `<li class="body-text" style="padding:0.3rem 0; border-bottom:1px solid #f3f4f6; display:flex; gap:0.6rem;"><span style="color:#026937;flex-shrink:0;">▸</span>${n}</li>`).join('')}
+      </ul>
+    ` : ''}
+    ${sym.example ? `
+      <div class="callout-box gold-box" style="margin-top:1rem">
+        <div class="callout-label">Engineering Example</div>
+        <div class="callout-content">${sym.example}</div>
+      </div>
+    ` : ''}
+  `;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   8. TAB 3 — PLAYGROUND RENDERER
+   ─────────────────────────────────────────────────────────────────────*/
+function renderPlaygroundTab(data, lectureId) {
+  const el = document.getElementById('tab-playground');
+  const pg = data.playground || {};
+
+  el.innerHTML = `
+    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
+      <div class="lecture-eyebrow">Mini SysML Playground</div>
+      <h2 class="lecture-title" style="font-size:1.6rem;">${pg.title || 'Interactive SysML Modeling'}</h2>
+      <p class="body-text" style="margin:0">${pg.instructions || 'Drag blocks, click the green port to start a connection, then click a destination block.'}</p>
+    </div>
+
+    <div class="pg-toolbar">
+      ${(pg.palette||[]).map(b => `<button class="pg-tool-btn" onclick="addPlaygroundBlock(${JSON.stringify(b).replace(/"/g,'&quot;')}, '${lectureId}')">${b.stereotype} ${b.name}</button>`).join('')}
+      <button class="pg-tool-btn" onclick="resetPlayground('${lectureId}')">↺ Reset</button>
+      <button class="pg-tool-btn danger" onclick="clearConnections('${lectureId}')">✕ Clear Connections</button>
+    </div>
+
+    <div id="playground-canvas-${lectureId}" class="playground-canvas" style="position:relative; width:100%; height:440px;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px),
+        repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px),
+        #fafafa;
+      border:1px solid #e2e4e7; border-radius:8px; overflow:hidden; user-select:none;">
+
+      <svg id="pg-svg-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;">
+        <defs>
+          <marker id="arrowhead-${lectureId}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#026937" />
+          </marker>
+        </defs>
+        <g id="pg-connections-${lectureId}"></g>
+      </svg>
+
+      <div id="pg-blocks-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;"></div>
+
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,0.9);border-top:1px solid #e2e4e7;padding:0.32rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:#9ca3af;display:flex;gap:1rem;">
+        <span id="pg-status-${lectureId}">Ready · Drag blocks to reposition · Click green port to connect</span>
+        <span style="margin-left:auto;color:#c8ccd0">Connections: <span id="pg-conn-count-${lectureId}">0</span></span>
+      </div>
+    </div>
+
+    ${pg.objectives ? `
+    <div class="callout-box" style="margin-top:1.25rem;">
+      <div class="callout-label">Mini-Project Objectives</div>
+      <div class="callout-content">
+        ${pg.objectives.map(o => `<div style="padding:0.2rem 0; display:flex; gap:0.5rem;"><span style="color:#026937;">▸</span>${o}</div>`).join('')}
+      </div>
+    </div>
+    ` : ''}
+  `;
+
+  // Initialize playground state
+  if (!STATE.playgroundState[lectureId]) {
+    STATE.playgroundState[lectureId] = {
+      blocks: [], connections: [], connectingFrom: null, blockCounter: 0
+    };
+    // Pre-populate with default blocks from data
+    if (pg.defaultBlocks) {
+      pg.defaultBlocks.forEach(b => addPlaygroundBlock(b, lectureId, b.x, b.y));
+    }
+  } else {
+    redrawPlayground(lectureId);
+  }
+}
+
+function addPlaygroundBlock(template, lectureId, overrideX, overrideY) {
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  ps.blockCounter++;
+  const id = `blk-${lectureId}-${ps.blockCounter}`;
+  const canvas = document.getElementById(`playground-canvas-${lectureId}`);
+  if (!canvas) return;
+
+  const x = overrideX !== undefined ? overrideX : 60 + (ps.blocks.length % 4) * 170;
+  const y = overrideY !== undefined ? overrideY : 80 + Math.floor(ps.blocks.length / 4) * 140;
+
+  const block = { id, stereotype: template.stereotype || '«block»', name: template.name, props: template.props || [], x, y };
+  ps.blocks.push(block);
+  renderBlock(block, lectureId);
+}
+
+function renderBlock(block, lectureId) {
+  const container = document.getElementById(`pg-blocks-${lectureId}`);
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.id = block.id;
+  div.className = 'pg-block';
+  div.style.left = block.x + 'px';
+  div.style.top = block.y + 'px';
+  div.style.position = 'absolute';
+  div.style.minWidth = '145px';
+  div.style.cursor = 'grab';
+  div.style.zIndex = '2';
+
+  div.innerHTML = `
+    <div class="pg-block-inner" id="${block.id}-inner">
+      <div class="pg-block-hdr">${block.stereotype}</div>
+      <div class="pg-block-name">${block.name}</div>
+      ${block.props.length ? `<div class="pg-block-props">${block.props.map(p=>`<div>– ${p}</div>`).join('')}</div>` : ''}
+      <div class="pg-conn-btn" title="Connect" onclick="startConnection('${block.id}','${lectureId}', event)">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" stroke="#e8ddb5" stroke-width="1.5"/></svg>
+      </div>
+    </div>
+  `;
+
+  // Drag logic
+  let isDragging = false, startX, startY, origX, origY;
+
+  div.addEventListener('mousedown', e => {
+    if (e.target.closest('.pg-conn-btn')) return;
+    isDragging = true;
+    startX = e.clientX; startY = e.clientY;
+    origX = block.x; origY = block.y;
+    div.style.cursor = 'grabbing';
+    div.style.zIndex = '20';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    block.x = Math.max(0, origX + dx);
+    block.y = Math.max(0, origY + dy);
+    div.style.left = block.x + 'px';
+    div.style.top = block.y + 'px';
+    updateConnectionLines(lectureId);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      div.style.cursor = 'grab';
+      div.style.zIndex = '2';
+    }
+  });
+
+  // Click to complete connection
+  div.addEventListener('click', e => {
+    if (e.target.closest('.pg-conn-btn')) return;
+    const ps = STATE.playgroundState[lectureId];
+    if (ps && ps.connectingFrom && ps.connectingFrom !== block.id) {
+      completeConnection(ps.connectingFrom, block.id, lectureId);
+    }
+  });
+
+  container.appendChild(div);
+}
+
+function startConnection(blockId, lectureId, e) {
+  e.stopPropagation();
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  ps.connectingFrom = blockId;
+  document.getElementById(`pg-status-${lectureId}`).textContent = `Connecting from ${blockId.split('-').slice(-1)[0]} — click a destination block`;
+  // Highlight source
+  const inner = document.getElementById(`${blockId}-inner`);
+  if (inner) inner.classList.add('selected-block');
+}
+
+function completeConnection(fromId, toId, lectureId) {
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  // Avoid duplicates
+  if (ps.connections.find(c => c.from === fromId && c.to === toId)) {
+    cancelConnection(lectureId); return;
+  }
+  ps.connections.push({ from: fromId, to: toId, label: 'association' });
+  updateConnectionLines(lectureId);
+  document.getElementById(`pg-conn-count-${lectureId}`).textContent = ps.connections.length;
+  document.getElementById(`pg-status-${lectureId}`).textContent = `Connected · ${ps.connections.length} connection(s) established`;
+  cancelConnection(lectureId);
+}
+
+function cancelConnection(lectureId) {
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  if (ps.connectingFrom) {
+    const inner = document.getElementById(`${ps.connectingFrom}-inner`);
+    if (inner) inner.classList.remove('selected-block');
+    ps.connectingFrom = null;
+  }
+}
+
+function updateConnectionLines(lectureId) {
+  const ps = STATE.playgroundState[lectureId];
+  const svg = document.getElementById(`pg-svg-${lectureId}`);
+  if (!ps || !svg) return;
+  const g = document.getElementById(`pg-connections-${lectureId}`);
+  g.innerHTML = '';
+
+  ps.connections.forEach(conn => {
+    const fb = ps.blocks.find(b => b.id === conn.from);
+    const tb = ps.blocks.find(b => b.id === conn.to);
+    if (!fb || !tb) return;
+
+    const fw = 145, fh = 60;
+    const x1 = fb.x + fw;
+    const y1 = fb.y + fh / 2;
+    const x2 = tb.x;
+    const y2 = tb.y + fh / 2;
+    const mx = (x1 + x2) / 2;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M ${x1},${y1} C ${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    path.setAttribute('stroke', '#026937');
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', '5,3');
+    path.setAttribute('marker-end', `url(#arrowhead-${lectureId})`);
+    g.appendChild(path);
+
+    // Label
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x', mx);
+    text.setAttribute('y', Math.min(y1,y2) - 6);
+    text.setAttribute('fill', '#9ca3af');
+    text.setAttribute('font-size', '9');
+    text.setAttribute('font-family', 'JetBrains Mono, monospace');
+    text.setAttribute('text-anchor', 'middle');
+    text.textContent = conn.label;
+    g.appendChild(text);
+  });
+}
+
+function redrawPlayground(lectureId) {
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  const container = document.getElementById(`pg-blocks-${lectureId}`);
+  if (!container) return;
+  container.innerHTML = '';
+  ps.blocks.forEach(b => renderBlock(b, lectureId));
+  updateConnectionLines(lectureId);
+  document.getElementById(`pg-conn-count-${lectureId}`).textContent = ps.connections.length;
+}
+
+function resetPlayground(lectureId) {
+  STATE.playgroundState[lectureId] = { blocks: [], connections: [], connectingFrom: null, blockCounter: 0 };
+  const data = window.MBSE_COURSE_DATA[STATE.activeLectureId];
+  if (data && data.playground && data.playground.defaultBlocks) {
+    data.playground.defaultBlocks.forEach(b => addPlaygroundBlock(b, lectureId, b.x, b.y));
+  }
+  updateConnectionLines(lectureId);
+  document.getElementById(`pg-conn-count-${lectureId}`).textContent = '0';
+  document.getElementById(`pg-status-${lectureId}`).textContent = 'Reset · Drag blocks to reposition';
+}
+
+function clearConnections(lectureId) {
+  const ps = STATE.playgroundState[lectureId];
+  if (!ps) return;
+  ps.connections = [];
+  ps.connectingFrom = null;
+  updateConnectionLines(lectureId);
+  document.getElementById(`pg-conn-count-${lectureId}`).textContent = '0';
+  document.getElementById(`pg-status-${lectureId}`).textContent = 'Connections cleared';
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   9. TAB 4 — QUIZ RENDERER
+   ─────────────────────────────────────────────────────────────────────*/
+function renderQuizTab(data, lectureId) {
+  const el = document.getElementById('tab-quiz');
+  const questions = (data.quiz || {}).questions || [];
+
+  // Load saved state from localStorage
+  const storageKey = `mbse-quiz-${lectureId}`;
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
+
+  if (!STATE.quizState[lectureId]) {
+    STATE.quizState[lectureId] = { answers: saved.answers || {}, submitted: saved.submitted || false };
+  }
+
+  el._quiz = { questions, lectureId };
+  renderQuizUI(el, lectureId);
+}
+
+function renderQuizUI(el, lectureId) {
+  const qs = el._quiz.questions;
+  const st = STATE.quizState[lectureId];
+  const total = qs.length;
+  const answered = Object.keys(st.answers).length;
+
+  let html = `
+    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
+      <div class="lecture-eyebrow">Knowledge Check — Lecture ${lectureId}</div>
+      <h2 class="lecture-title" style="font-size:1.6rem;">5-Question Assessment</h2>
+    </div>
+  `;
+
+  if (st.submitted) {
+    // Score view
+    const score = qs.filter((q,i) => st.answers[i] === q.correct).length;
+    const pct = Math.round((score/total)*100);
+    const grade = pct>=90?'A':pct>=80?'B':pct>=70?'C':pct>=60?'D':'F';
+    const gradeColor = pct>=70 ? '#4ade80' : '#f87171';
+
+    html += `
+      <div class="quiz-score-banner">
+        <div class="quiz-score-pct">${pct}%</div>
+        <div class="quiz-score-label">${score} of ${total} correct</div>
+        <div style="margin-top:0.75rem;">
+          <span class="grade-letter" style="color:${gradeColor}; border:1px solid ${gradeColor}40; background:${gradeColor}10;">${grade}</span>
+        </div>
+        <div style="margin-top:1rem; font-size:0.78rem; color:#4a6070;">Results auto-saved to local storage.</div>
+      </div>
+      <div style="display:flex; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+        <button class="quiz-submit-btn" onclick="retakeQuiz(${lectureId})">↺ Retake Quiz</button>
+        <button class="quiz-submit-btn" style="background:#f3f4f6; color:#374151; border:1px solid #e2e4e7;" onclick="reviewQuiz(${lectureId})">Review Answers</button>
+      </div>
+    `;
+    html += renderQuizQuestions(qs, st, true);
+  } else {
+    html += `
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" style="width:${(answered/total)*100}%"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:#4a6070; margin-bottom:1.25rem;">${answered}/${total} answered</div>
+    `;
+    html += renderQuizQuestions(qs, st, false);
+    html += `
+      <button class="quiz-submit-btn" id="quiz-submit-btn-${lectureId}"
+        onclick="submitQuiz(${lectureId})"
+        ${answered < total ? 'disabled' : ''}>
+        Submit Quiz →
+      </button>
+    `;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderQuizQuestions(qs, st, revealed) {
+  const letters = ['A','B','C','D','E'];
+  return qs.map((q, qi) => {
+    const chosen = st.answers[qi];
+    const isCorrect = chosen === q.correct;
+    let qHtml = `
+      <div class="quiz-question-card">
+        <div class="quiz-q-num">Question ${qi+1} of ${qs.length}</div>
+        <div class="quiz-q-text">${q.question}</div>
+    `;
+    q.options.forEach((opt, oi) => {
+      let cls = 'quiz-option';
+      if (chosen === oi) cls += revealed ? (isCorrect ? ' correct' : ' incorrect') : ' selected';
+      if (revealed && oi === q.correct && !isCorrect) cls += ' correct-answer';
+      const clickAttr = revealed ? '' : `onclick="selectQuizAnswer(${qi},${oi},${JSON.stringify(qs).replace(/"/g,'&quot;')},'TODO')"`;
+      qHtml += `<div class="${cls}" ${clickAttr}>
+        <span class="quiz-option-letter">${letters[oi]}</span>
+        <span class="quiz-option-text">${opt}</span>
+      </div>`;
+    });
+    if (revealed && q.explanation) {
+      const cls2 = st.answers[qi] === q.correct ? 'quiz-feedback correct-fb' : 'quiz-feedback incorrect-fb';
+      qHtml += `<div class="${cls2}">💡 ${q.explanation}</div>`;
+    }
+    qHtml += `</div>`;
+    return qHtml;
+  }).join('');
+}
+
+function selectQuizAnswer(questionIndex, optionIndex, questionsIgnored, lectureIdIgnored) {
+  // Get active lecture from state
+  const lectureId = STATE.activeLectureId;
+  const st = STATE.quizState[lectureId];
+  if (!st || st.submitted) return;
+  st.answers[questionIndex] = optionIndex;
+  // Update progress bar & button
+  const total = (window.MBSE_COURSE_DATA[lectureId]?.quiz?.questions || []).length;
+  const answered = Object.keys(st.answers).length;
+  const progressFill = document.querySelector('#tab-quiz .quiz-progress-fill');
+  if (progressFill) progressFill.style.width = `${(answered/total)*100}%`;
+  const countEl = document.querySelector('#tab-quiz [style*="0/"]') || document.querySelector('#tab-quiz [style*="JetBrains"]');
+  // Re-render question cards for visual selection feedback
+  const qCards = document.querySelectorAll('#tab-quiz .quiz-question-card');
+  qCards.forEach((card, qi) => {
+    const opts = card.querySelectorAll('.quiz-option');
+    opts.forEach((opt, oi) => {
+      opt.classList.toggle('selected', st.answers[qi] === oi);
+    });
+  });
+  // Enable submit if all answered
+  const btn = document.getElementById(`quiz-submit-btn-${lectureId}`);
+  if (btn && answered >= total) btn.removeAttribute('disabled');
+  // Update counter text
+  const ctr = document.querySelector('#tab-quiz .quiz-q-num')?.closest('.quiz-question-card')?.previousElementSibling;
+}
+
+function submitQuiz(lectureId) {
+  const st = STATE.quizState[lectureId];
+  if (!st) return;
+  st.submitted = true;
+  // Save to localStorage
+  try { localStorage.setItem(`mbse-quiz-${lectureId}`, JSON.stringify(st)); } catch(e) {}
+  // Re-render
+  const el = document.getElementById('tab-quiz');
+  el._quiz = el._quiz || {};
+  renderQuizUI(el, lectureId);
+}
+
+function retakeQuiz(lectureId) {
+  STATE.quizState[lectureId] = { answers: {}, submitted: false };
+  try { localStorage.removeItem(`mbse-quiz-${lectureId}`); } catch(e) {}
+  const el = document.getElementById('tab-quiz');
+  renderQuizUI(el, lectureId);
+}
+
+function reviewQuiz(lectureId) {
+  const el = document.getElementById('tab-quiz');
+  renderQuizUI(el, lectureId);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   10. TAB 5 — ASSIGNMENT & RUBRIC RENDERER
+   ─────────────────────────────────────────────────────────────────────*/
+function renderAssignmentTab(data, lectureId) {
+  const el = document.getElementById('tab-assignment');
+  const asgn = data.assignment || {};
+  const rubric = asgn.rubric || [];
+
+  // Restore saved slider values
+  const storageKey = `mbse-asgn-${lectureId}`;
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
+  if (!STATE.assignmentState[lectureId]) {
+    STATE.assignmentState[lectureId] = saved.scores || {};
+  }
+
+  let html = `
+    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
+      <div class="lecture-eyebrow">Assignment &amp; Grading Rubric · Lecture ${lectureId}</div>
+      <h2 class="lecture-title" style="font-size:1.6rem;">${asgn.title || 'Weekly Challenge'}</h2>
+    </div>
+
+    <!-- Assignment Brief -->
+    <div class="callout-box gold-box">
+      <div class="callout-label">Assignment Brief</div>
+      <div class="callout-content">${asgn.brief || ''}</div>
+    </div>
+
+    <!-- Deliverables -->
+    ${asgn.deliverables && asgn.deliverables.length ? `
+    <div class="section-hdr">Deliverables</div>
+    <ul style="list-style:none; padding:0; margin:0 0 1.5rem;">
+      ${asgn.deliverables.map((d,i) => `<li class="body-text" style="padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; gap:0.75rem;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#4e5668; flex-shrink:0;">${String(i+1).padStart(2,'0')}</span>
+        ${d}
+      </li>`).join('')}
+    </ul>
+    ` : ''}
+
+    <!-- Rubric -->
+    <div class="section-hdr">Interactive Grading Calculator</div>
+    <p class="body-text">Adjust each slider to calculate your projected score. Values persist locally.</p>
+
+    <div style="background:#fff; border:1px solid #e2e4e7; border-radius:8px; overflow:hidden; margin-bottom:1.5rem;">
+      <!-- Column headers -->
+      <div style="display:grid; grid-template-columns:1fr 80px 130px 60px; gap:0.75rem; padding:0.6rem 1rem; background:#f9fafb; border-bottom:1px solid #e5e7eb;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em;">Criterion</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em;">Max</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em;">Your Score</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em;">Pts</div>
+      </div>
+      ${rubric.map((row, ri) => {
+        const savedVal = STATE.assignmentState[lectureId][ri] !== undefined ? STATE.assignmentState[lectureId][ri] : row.max;
+        return `
+        <div style="display:grid; grid-template-columns:1fr 80px 130px 60px; gap:0.75rem; align-items:center; padding:0.85rem 1rem; border-bottom:1px solid rgba(255,255,255,0.04);">
+          <div>
+            <div style="font-size:0.82rem; color:#1a1a1a; font-weight:500; margin-bottom:0.18rem;">${row.criterion}</div>
+            <div style="font-size:0.7rem; color:#9ca3af;">${row.descriptor || ''}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:#9ca3af; text-align:center;">${row.max}</div>
+          <div>
+            <input type="range" class="rubric-slider" min="0" max="${row.max}" value="${savedVal}"
+              oninput="updateRubricScore(${ri},this.value,'${lectureId}')" style="width:100%;">
+          </div>
+          <div id="rubric-val-${lectureId}-${ri}" style="font-family:'JetBrains Mono',monospace; font-size:0.74rem; font-weight:600; color:#026937; text-align:right;">${savedVal}</div>
+        </div>`;
+      }).join('')}
+
+      <!-- Total Row -->
+      <div style="display:grid; grid-template-columns:1fr 80px 130px 60px; gap:0.75rem; align-items:center; padding:1rem; background:#f9fafb; border-top:1px solid #e5e7eb;">
+        <div style="font-size:0.85rem; font-weight:600; color:#374151; letter-spacing:0.06em;">TOTAL</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:#9ca3af; font-weight:600; text-align:center;">100</div>
+        <div></div>
+        <div id="rubric-total-${lectureId}" style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:#026937; text-align:right; line-height:1;">${calcTotal(lectureId, rubric)}</div>
+      </div>
+    </div>
+
+    <!-- Grade Band Display -->
+    <div style="background:#fff; border:1px solid #e2e4e7; border-radius:8px; padding:1.4rem 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.14em; color:#9ca3af; margin-bottom:0.4rem;">Current Grade</div>
+        <div style="font-family:'Playfair Display',serif; font-size:3.4rem; font-weight:900; color:#026937; line-height:1;" id="grade-display-${lectureId}">${getGrade(calcTotal(lectureId, rubric))}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.3rem;">Score</div>
+        <div id="score-pct-display-${lectureId}" style="font-size:1.05rem; font-weight:600; color:#374151;">${calcTotal(lectureId, rubric)} / 100</div>
+      </div>
+    </div>
+
+    <!-- Context & Tips -->
+    ${asgn.gradingNotes ? `
+    <div class="section-hdr" style="margin-top:2rem;">Grading Notes</div>
+    <ul style="list-style:none; padding:0; margin:0;">
+      ${asgn.gradingNotes.map(n=>`<li class="body-text" style="padding:0.3rem 0; border-bottom:1px solid #f3f4f6; display:flex; gap:0.6rem;"><span style="color:#026937;flex-shrink:0;">▸</span>${n}</li>`).join('')}
+    </ul>
+    ` : ''}
+  `;
+
+  el.innerHTML = html;
+  el._rubric = rubric;
+}
+
+function calcTotal(lectureId, rubric) {
+  const scores = STATE.assignmentState[lectureId] || {};
+  return rubric.reduce((sum, row, i) => {
+    const v = scores[i] !== undefined ? parseInt(scores[i]) : row.max;
+    return sum + v;
+  }, 0);
+}
+
+function updateRubricScore(rowIndex, value, lectureId) {
+  if (!STATE.assignmentState[lectureId]) STATE.assignmentState[lectureId] = {};
+  STATE.assignmentState[lectureId][rowIndex] = parseInt(value);
+
+  document.getElementById(`rubric-val-${lectureId}-${rowIndex}`).textContent = value;
+
+  const el = document.getElementById('tab-assignment');
+  const rubric = el._rubric || [];
+  const total = calcTotal(lectureId, rubric);
+  document.getElementById(`rubric-total-${lectureId}`).textContent = total;
+  document.getElementById(`grade-display-${lectureId}`).textContent = getGrade(total);
+  document.getElementById(`score-pct-display-${lectureId}`).textContent = `${total} / 100`;
+
+  try {
+    localStorage.setItem(`mbse-asgn-${lectureId}`, JSON.stringify({ scores: STATE.assignmentState[lectureId] }));
+  } catch(e) {}
+}
+
+function getGrade(score) {
+  if (score >= 93) return 'A';
+  if (score >= 90) return 'A−';
+  if (score >= 87) return 'B+';
+  if (score >= 83) return 'B';
+  if (score >= 80) return 'B−';
+  if (score >= 77) return 'C+';
+  if (score >= 73) return 'C';
+  if (score >= 70) return 'C−';
+  if (score >= 67) return 'D+';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   11. DROPDOWN TOGGLE
+   ─────────────────────────────────────────────────────────────────────*/
+function toggleDropdown() {
+  const btn  = document.getElementById('lecture-dropdown-btn');
+  const menu = document.getElementById('lecture-dropdown-menu');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+function closeDropdown() {
+  document.getElementById('lecture-dropdown-btn').classList.remove('open');
+  document.getElementById('lecture-dropdown-menu').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown-wrap')) closeDropdown();
+});
+
+/* ─────────────────────────────────────────────────────────────────────
+   12. NOT-AVAILABLE STATE
+   ─────────────────────────────────────────────────────────────────────*/
+function showNotAvailable(id) {
+  const reg = COURSE_REGISTRY.find(l => l.id === id);
+  document.getElementById('splash-state').style.display = 'none';
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('tab-content').style.display = 'block';
+  document.getElementById('tab-content').innerHTML = `
+    <div style="padding:5rem 2rem; max-width:480px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:#9ca3af; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:0.75rem;">Lecture ${id} · Not yet available</div>
+      <h2 style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:#1a1a1a; margin:0 0 0.75rem; line-height:1.25;">${reg ? reg.title : ''}</h2>
+      <p style="color:#6b7280; font-size:0.85rem; line-height:1.7; margin:0 0 1.5rem;">This lecture file has not been added to the repository yet.</p>
+      <div style="background:#fff; border:1px solid #e2e4e7; border-radius:6px; padding:0.85rem 1rem;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.4rem;">To add this lecture</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:#374151;">Drop <span style="color:#026937; font-weight:600;">lecture${id}.js</span> into the repository root alongside index.html and reload.</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   13. LECTURE MERGE HOOK
+   External lecture files call window.registerLecture(id, data)
+   which populates MBSE_COURSE_DATA and optionally auto-renders.
+   ─────────────────────────────────────────────────────────────────────*/
+window.registerLecture = function(id, data) {
+  window.MBSE_COURSE_DATA[id] = data;
+  // Mark sidebar badge
+  const badge = document.getElementById(`badge-${id}`);
+  if (badge) badge.style.display = 'flex';
+  const si = document.getElementById(`sidebar-item-${id}`);
+  if (si) si.classList.add('loaded');
+  // Auto-render if this is the active lecture
+  if (STATE.activeLectureId === id) loadLecture(id);
+};
+
+</script>
+</body>
+</html>
