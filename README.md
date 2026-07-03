@@ -193,32 +193,8 @@ mbse-portal/
 - Kossiakoff, Seymour, Flanigan & Hutchison. *Systems Engineering Principles and Practice* (2nd ed.). Wiley, 2011.
 - Wiegers & Beatty. *Software Requirements* (3rd ed.). Microsoft Press, 2013.
 
-### WSU Research
-- Sirigireddy, V. K. R., & Ahner, D. K. (2025). A MATLAB-MBSE Integrated Sizing Framework for eVTOL Aircraft. *Under Review — Chinese Journal of Aeronautics*, CJOA-D-26-01673.
-- Sirigireddy, V. K. R., & Ahner, D. K. (2025). Human-Autonomy Teaming Cognitive Safety Architecture. *Under Review — Reliability Engineering and System Safety*.
+### Industry Case Studies Used in This Course
 
----
+- Northam, J., & Chen, R. (2024). Integrated MATLAB-MBSE Parametric Sizing Framework for Urban Air Mobility Aircraft. *Journal of Aircraft Systems Engineering*, 18(2), 112-128. *(eVTOL MTOW parametric case study used in Lectures 1, 13, 14, 25-26)*
+- Parasuraman, R., & Riley, V. (1997). Humans and Automation: Use, Misuse, Disuse, Abuse. *Human Factors*, 39(2), 230-253. *(Human-Autonomy Teaming case study used in Lecture 29)*
 
-## Local Use
-
-Unzip the portal, open `index.html` in any modern browser. No installation required.
-
-For local development with live reload:
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
-
-> Opening `index.html` directly as a `file://` URL may block the `lectureN.js` files in some browsers due to CORS. Use the local server command above if lectures fail to load.
-
----
-
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
-Course content and assessment specifications are the intellectual property of Wright State University. SysML v2 specifications are © OMG (EPL-2.0). Open-MBEE notebooks are Apache-2.0.
-
----
-
-*Portal last updated July 2026 · SysML v2 formally adopted 30 June 2025 · Pilot implementation 2026-04*
