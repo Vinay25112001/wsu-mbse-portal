@@ -479,59 +479,154 @@
       margin-top: 1.1rem;
     }
 
-    /* ── Playground ────────────────────────────────────────────────── */
-    .playground-canvas {
-      border: 1px solid #e2e4e7 !important;
-      border-radius: 8px !important;
+    /* ── Playground — Full Interactive SysML Modeler ──────────────── */
+    .pg-wrap { display:flex; gap:1rem; height:560px; }
+    .pg-panel-left { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:0.5rem; overflow-y:auto; }
+    .pg-panel-left h4 { margin:0 0 0.4rem; font-size:0.68rem; text-transform:uppercase; letter-spacing:.08em; color:#6b7280; font-weight:600; }
+    .pg-palette-item {
+      padding:0.5rem 0.7rem; border-radius:6px; border:1px solid #e2e4e7;
+      background:#fff; cursor:grab; font-size:0.68rem; font-family:'JetBrains Mono',monospace;
+      transition:all .15s; user-select:none; position:relative;
     }
-    .pg-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
-    .pg-tool-btn {
-      padding: 0.35rem 0.85rem;
-      font-size: 0.71rem;
-      font-weight: 500;
-      border-radius: 5px;
-      border: 1px solid #e2e4e7;
-      background: #ffffff;
-      color: #374151;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
+    .pg-palette-item:hover { border-color:#026937; background:#f0faf4; transform:translateX(2px); }
+    .pg-palette-item .pi-stereo { font-size:0.6rem; color:#026937; font-weight:600; margin-bottom:2px; }
+    .pg-palette-item .pi-name  { color:#1a1a1a; font-weight:600; }
+    .pg-palette-item .pi-hint  { font-size:0.58rem; color:#9ca3af; margin-top:2px; }
+    .pg-palette-item[draggable] { cursor:grab; }
+
+    .pg-canvas-wrap { flex:1; position:relative; border-radius:8px; overflow:hidden;
+      border:1.5px solid #e2e4e7; background:#fafafa;
+      background-image:
+        radial-gradient(circle, #ccc 1px, transparent 1px);
+      background-size:24px 24px; }
+    .pg-canvas-wrap.connect-mode { border-color:#C9A227; cursor:crosshair; }
+    .pg-canvas-wrap.connect-mode .pg-node { cursor:crosshair; }
+
+    .pg-svg { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1; }
+    .pg-nodes { position:absolute;top:0;left:0;width:100%;height:100%;z-index:2; }
+
+    /* SysML Node cards */
+    .pg-node {
+      position:absolute; min-width:140px; cursor:grab; z-index:3;
+      filter:drop-shadow(0 2px 6px rgba(0,0,0,0.08));
+      transition:filter .15s;
     }
-    .pg-tool-btn:hover { background: #f0faf4; border-color: #a7d4b8; color: #026937; }
-    .pg-tool-btn.danger {
-      border-color: #fca5a5;
-      color: #dc2626;
-      background: #fff5f5;
+    .pg-node:hover { filter:drop-shadow(0 4px 12px rgba(2,105,55,0.2)); z-index:10; }
+    .pg-node.dragging { cursor:grabbing; filter:drop-shadow(0 8px 20px rgba(2,105,55,0.3)); z-index:20; opacity:.92; }
+    .pg-node.selected .pg-node-body { border-color:#026937; box-shadow:0 0 0 2px rgba(2,105,55,0.2); }
+    .pg-node.source-node .pg-node-body { border-color:#C9A227; box-shadow:0 0 0 2px rgba(201,162,39,0.25); }
+
+    .pg-node-body { background:#fff; border:1.5px solid #d1d5db; border-radius:6px; overflow:hidden; font-family:'JetBrains Mono',monospace; }
+    .pg-node-hdr  { padding:0.3rem 0.6rem 0.25rem; font-size:0.6rem; font-weight:600; text-align:center; letter-spacing:.04em; }
+    .pg-node-name { padding:0.3rem 0.6rem; font-size:0.72rem; font-weight:700; color:#1a1a1a; border-top:1px solid #e8eaec; border-bottom:1px solid #e8eaec; text-align:center; }
+    .pg-node-props { padding:0.25rem 0.55rem 0.35rem; font-size:0.58rem; color:#6b7280; }
+    .pg-node-prop  { padding:1px 0; }
+
+    /* Stereotype-based color coding */
+    .pg-node[data-stereo*="block"] .pg-node-hdr   { background:#e8f5ed; color:#026937; }
+    .pg-node[data-stereo*="require"] .pg-node-hdr { background:#fef3c7; color:#92400e; }
+    .pg-node[data-stereo*="actor"] .pg-node-hdr   { background:#ede9fe; color:#5b21b6; }
+    .pg-node[data-stereo*="usecase"] .pg-node-hdr { background:#dbeafe; color:#1e40af; }
+    .pg-node[data-stereo*="part"] .pg-node-hdr    { background:#d1fae5; color:#065f46; }
+    .pg-node[data-stereo*="constraint"] .pg-node-hdr { background:#fce7f3; color:#9d174d; }
+    .pg-node[data-stereo*="test"] .pg-node-hdr    { background:#e0f2fe; color:#075985; }
+    .pg-node[data-stereo*="package"] .pg-node-hdr { background:#f3f4f6; color:#374151; }
+    .pg-node[data-stereo*="context"] .pg-node-hdr { background:#ecfdf5; color:#064e3b; }
+
+    /* Port dots on node edges */
+    .pg-port {
+      position:absolute; width:10px; height:10px; border-radius:50%;
+      background:#026937; border:2px solid #fff;
+      cursor:crosshair; z-index:5; transition:transform .15s, box-shadow .15s;
+      box-shadow:0 1px 3px rgba(0,0,0,0.2);
     }
-    .pg-tool-btn.danger:hover { background: #fee2e2; }
-    .pg-block-inner {
-      background: #ffffff;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
-      font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    .pg-port:hover { transform:scale(1.5); box-shadow:0 2px 8px rgba(2,105,55,0.4); }
+    .pg-port.right  { right:-5px; top:50%; transform:translateY(-50%); }
+    .pg-port.right:hover { transform:translateY(-50%) scale(1.5); }
+    .pg-port.left   { left:-5px; top:50%; transform:translateY(-50%); }
+    .pg-port.left:hover { transform:translateY(-50%) scale(1.5); }
+    .pg-port.bottom { bottom:-5px; left:50%; transform:translateX(-50%); }
+    .pg-port.bottom:hover { transform:translateX(-50%) scale(1.5); }
+
+    /* Delete button on hover */
+    .pg-node-del { position:absolute;top:-6px;right:-6px;width:16px;height:16px;
+      border-radius:50%;background:#ef4444;color:#fff;font-size:9px;font-weight:700;
+      display:none;align-items:center;justify-content:center;cursor:pointer;z-index:6;
+      border:1.5px solid #fff; }
+    .pg-node:hover .pg-node-del { display:flex; }
+
+    /* Relationship type selector */
+    .pg-rel-picker {
+      position:fixed; background:#fff; border:1px solid #e2e4e7; border-radius:8px;
+      padding:0.5rem; z-index:1000; box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      min-width:170px; display:none;
     }
-    .pg-block-inner.selected-block { border-color: #026937; box-shadow: 0 0 0 2px rgba(2,105,55,0.15); }
-    .pg-block-hdr {
-      background: #f3f4f6;
-      padding: 0.28rem 0.7rem;
-      font-size: 0.58rem;
-      color: #9ca3af;
-      letter-spacing: 0.1em;
-      border-bottom: 1px solid #e5e7eb;
+    .pg-rel-picker.open { display:block; }
+    .pg-rel-picker h5 { margin:0 0 0.4rem; font-size:0.65rem; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; }
+    .pg-rel-opt {
+      padding:0.38rem 0.6rem; border-radius:5px; font-size:0.68rem; font-family:'JetBrains Mono',monospace;
+      cursor:pointer; transition:background .1s; display:flex; align-items:center; gap:0.5rem;
     }
-    .pg-block-name { padding: 0.42rem 0.7rem; color: #1a1a1a; font-size: 0.73rem; font-weight: 600; }
-    .pg-block-props { padding: 0 0.7rem 0.42rem; color: #9ca3af; font-size: 0.63rem; }
-    .pg-conn-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: #026937; border: 2px solid #fff;
-      position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
-      cursor: crosshair; transition: background 0.12s; z-index: 5;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    .pg-rel-opt:hover { background:#f0faf4; }
+    .pg-rel-opt .rel-icon { font-size:0.75rem; }
+
+    /* Toolbar */
+    .pg-toolbar2 {
+      position:absolute; top:8px; right:8px; z-index:15;
+      display:flex; gap:0.4rem; flex-wrap:wrap; justify-content:flex-end;
     }
-    .pg-conn-btn:hover { background: #C9A227; }
+    .pg-tb-btn {
+      padding:0.3rem 0.7rem; border-radius:5px; border:1px solid #e2e4e7;
+      background:rgba(255,255,255,0.92); font-size:0.65rem; font-family:'JetBrains Mono',monospace;
+      cursor:pointer; backdrop-filter:blur(4px); transition:all .12s; color:#374151;
+    }
+    .pg-tb-btn:hover { background:#026937; color:#fff; border-color:#026937; }
+    .pg-tb-btn.active { background:#026937; color:#fff; border-color:#026937; }
+
+    /* Status bar */
+    .pg-status-bar {
+      position:absolute; bottom:0; left:0; right:0;
+      background:rgba(255,255,255,0.92); border-top:1px solid #e8eaec;
+      padding:0.28rem 0.75rem; font-family:'JetBrains Mono',monospace;
+      font-size:0.6rem; color:#6b7280; display:flex; align-items:center; gap:1rem;
+      backdrop-filter:blur(4px);
+    }
+    .pg-status-dot { width:6px;height:6px;border-radius:50%;background:#026937;flex-shrink:0; }
+    .pg-status-dot.connecting { background:#C9A227; animation:pulse2 .8s ease-in-out infinite; }
+    @keyframes pulse2 { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:.7} }
+
+    /* Achievement toast */
+    .pg-toast {
+      position:fixed; bottom:24px; right:24px; z-index:9999;
+      background:#026937; color:#fff; border-radius:8px; padding:.6rem 1rem;
+      font-size:.73rem; font-family:'JetBrains Mono',monospace;
+      box-shadow:0 4px 16px rgba(2,105,55,0.35);
+      transform:translateY(80px); opacity:0;
+      transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      pointer-events:none; max-width:280px;
+    }
+    .pg-toast.show { transform:translateY(0); opacity:1; }
+
+    /* Objectives panel */
+    .pg-objectives { margin-top:1rem; display:flex; flex-direction:column; gap:0.4rem; }
+    .pg-obj-item {
+      display:flex; align-items:flex-start; gap:0.6rem; padding:0.45rem 0.65rem;
+      border-radius:6px; background:#fff; border:1px solid #e8eaec;
+      font-size:0.72rem; transition:all .2s;
+    }
+    .pg-obj-item.done { background:#f0faf4; border-color:#a7d4b8; }
+    .pg-obj-item.done .obj-check { background:#026937; color:#fff; }
+    .pg-obj-check { width:18px;height:18px;border-radius:50%;border:1.5px solid #d1d5db;
+      display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;
+      margin-top:1px; transition:all .2s; }
+    .pg-obj-item.done .pg-obj-check { background:#026937;border-color:#026937;color:#fff; }
+    .pg-obj-text { color:#374151; line-height:1.4; }
+    .pg-obj-item.done .pg-obj-text { color:#047857; }
+
+    /* Mini legend */
+    .pg-legend { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.75rem; }
+    .pg-legend-item { display:flex;align-items:center;gap:4px;font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:#6b7280; }
+    .pg-legend-line { width:24px;height:2px; }
 
     /* ── Quiz ──────────────────────────────────────────────────────── */
     .quiz-progress-bar {
@@ -1015,64 +1110,68 @@ function switchTab(tabName, btn) {
 /* ─────────────────────────────────────────────────────────────────────
    6. TAB 1 — LECTURE CONTENT RENDERER
    ─────────────────────────────────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────
+   6. TAB 1 — CONTENT RENDERER (Visual Card Layout)
+   ─────────────────────────────────────────────────────────────────────*/
 function renderContentTab(data) {
   const el = document.getElementById('tab-content');
-  const lec = data.meta;
-  const sections = data.content;
+  const lec = data.meta || {};
+  const sections = data.content || [];
 
+  // Header
   let html = `
     <div class="lecture-hdr">
-      <div class="lecture-eyebrow">Lecture ${lec.id} · Week ${lec.week} · ${lec.unit}</div>
-      <h1 class="lecture-title">${lec.title}</h1>
-      <div class="lecture-meta">
-        <span class="meta-chip">⏱ ${lec.duration}</span>
-        <span class="meta-chip">📊 ${lec.difficulty}</span>
-        <span class="meta-chip gold">🎯 ${lec.creditHours} Credit Hours</span>
-        <span class="meta-chip">📚 INCOSE SE Handbook v5</span>
-        <span class="meta-chip">🔷 OMG SysML 1.7</span>
+      <div class="lecture-eyebrow">Week ${lec.week} · ${lec.unit || 'Foundations'}</div>
+      <h1 class="lecture-title">${lec.title || 'Lecture'}</h1>
+      <div class="info-grid">
+        <div class="info-cell"><div class="info-cell-label">⏱ Duration</div><div class="info-cell-val">${lec.duration||'90 min'}</div></div>
+        <div class="info-cell"><div class="info-cell-label">📚 Study</div><div class="info-cell-val">${lec.studyHours||'3–4 hrs'}</div></div>
+        <div class="info-cell"><div class="info-cell-label">🛠 Tools</div><div class="info-cell-val" style="color:#9ab5c8;font-size:.74rem">${(lec.tools||[]).join(', ')}</div></div>
+        <div class="info-cell"><div class="info-cell-label">📋 Prereqs</div><div class="info-cell-val" style="color:#9ab5c8;font-size:.74rem">${(lec.prerequisites||[]).join(', ')||'None'}</div></div>
       </div>
-    </div>
-
-    <!-- Learning Objectives -->
-    <div style="margin-bottom:2rem;">
-      <div class="section-hdr" style="margin-top:0">Learning Objectives</div>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
-        ${lec.objectives.map(o => `<span class="obj-pill">✓ ${o}</span>`).join('')}
-      </div>
-    </div>
-
-    <!-- Info Grid -->
-    <div class="info-grid">
-      <div class="info-cell"><div class="info-cell-label">Prerequisites</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.prerequisites||[]).join(', ') || 'None'}</div></div>
-      <div class="info-cell"><div class="info-cell-label">Est. Study Time</div><div class="info-cell-val">${lec.studyHours || '3–4 hrs'}</div></div>
-      <div class="info-cell"><div class="info-cell-label">Tooling</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.tools||[]).join(', ')}</div></div>
-      <div class="info-cell"><div class="info-cell-label">Common Errors</div><div class="info-cell-val" style="color:#9ab5c8; font-size:0.74rem;">${(lec.commonErrors||['See section notes']).join('; ')}</div></div>
     </div>
   `;
 
-  // Render sections
+  // Learning Objectives — visual chips
+  if (lec.objectives && lec.objectives.length) {
+    html += `<div class="section-hdr" style="margin-bottom:.75rem">🎯 Learning Objectives</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.75rem;">
+      ${lec.objectives.map((o,i) => `
+        <div style="display:flex;align-items:flex-start;gap:.5rem;background:#f0faf4;border:1px solid #a7d4b8;border-radius:8px;padding:.45rem .75rem;max-width:100%;">
+          <span style="background:#026937;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${i+1}</span>
+          <span style="font-size:.73rem;color:#064e3b;line-height:1.5;">${o}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Sections — visual card layout
   sections.forEach((sec, si) => {
     html += `<div class="section-hdr">${sec.heading}</div>`;
 
-    sec.paragraphs.forEach((para, pi) => {
-      const cls = (si === 0 && pi === 0) ? 'body-text drop-cap-first' : 'body-text';
-      html += `<p class="${cls}">${para}</p>`;
-    });
+    // Key concept pill extracted from first sentence of first para
+    if (sec.paragraphs && sec.paragraphs.length > 0) {
+      // Render paragraphs as readable prose BUT with key terms highlighted
+      sec.paragraphs.forEach((para, pi) => {
+        // Split into digestible chunks — highlight text in bold/italic stays, add visual
+        html += `<p class="body-text ${si===0&&pi===0?'drop-cap-first':''}" style="margin-bottom:.9rem;">${para}</p>`;
+      });
+    }
 
+    // Callout
     if (sec.callout) {
-      const boxCls = sec.callout.type === 'gold' ? 'callout-box gold-box' : 'callout-box';
-      html += `<div class="${boxCls}">
+      const isGold = sec.callout.type === 'gold';
+      html += `<div class="callout-box ${isGold?'gold-box':''}" style="margin:1rem 0 1.25rem;">
         <div class="callout-label">${sec.callout.label}</div>
         <div class="callout-content">${sec.callout.body}</div>
       </div>`;
     }
 
+    // Equations — visual blocks
     if (sec.equations && sec.equations.length) {
-      sec.equations.forEach(eq => {
-        html += `<div class="equation-block">${eq}</div>`;
-      });
+      sec.equations.forEach(eq => { html += `<div class="equation-block">${eq}</div>`; });
     }
 
+    // Subsections
     if (sec.subsections && sec.subsections.length) {
       sec.subsections.forEach(sub => {
         html += `<div class="subsection-hdr">${sub.title}</div>`;
@@ -1088,11 +1187,28 @@ function renderContentTab(data) {
     }
   });
 
-  // References
+  // Common errors — visual warning cards
+  if (lec.commonErrors && lec.commonErrors.length) {
+    html += `<div class="section-hdr" style="margin-top:2rem">⚠️ Common Mistakes to Avoid</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.6rem;margin-bottom:1.5rem;">
+      ${lec.commonErrors.map(e => `
+        <div style="background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:.6rem .8rem;display:flex;gap:.5rem;align-items:flex-start;">
+          <span style="color:#ea580c;font-size:1rem;flex-shrink:0;margin-top:-1px;">✗</span>
+          <span style="font-size:.72rem;color:#9a3412;line-height:1.5;">${e}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // References — compact chips
   if (data.references && data.references.length) {
-    html += `<div class="section-hdr" style="margin-top:2.5rem">Recommended References</div>
+    html += `<div class="section-hdr" style="margin-top:2.5rem">📖 References</div>
     <ul class="reference-list">
-      ${data.references.map(r => `<li>${r}</li>`).join('')}
+      ${data.references.map(r => {
+        // Make GitHub URLs clickable
+        const linked = r.replace(/(https:\/\/github\.com\/[^\s)]+)/g, '<a href="$1" target="_blank" style="color:#026937">$1</a>')
+                        .replace(/(https:\/\/www\.omg\.org\/[^\s)]+)/g, '<a href="$1" target="_blank" style="color:#026937">$1</a>');
+        return `<li>${linked}</li>`;
+      }).join('')}
     </ul>`;
   }
 
@@ -1100,335 +1216,992 @@ function renderContentTab(data) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   7. TAB 2 — SCHEMA VISUALIZER RENDERER
+   7. TAB 2 — SCHEMA VISUALIZER (Improved card layout)
    ─────────────────────────────────────────────────────────────────────*/
 function renderSchemaTab(data) {
   const el = document.getElementById('tab-schema');
   const symbols = data.schemaVisualizer || [];
 
   let html = `
-    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
-      <div class="lecture-eyebrow">Interactive Schema Visualizer</div>
-      <h2 class="lecture-title" style="font-size:1.6rem;">SysML Symbols &amp; Notation Guide</h2>
-      <p class="body-text" style="margin:0">Click any card to expand its full notation reference and visual representation.</p>
+    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.25rem;">
+      <div class="lecture-eyebrow">Schema Visualizer</div>
+      <h2 class="lecture-title" style="font-size:1.6rem;">Diagram Reference Library</h2>
+      <p style="margin:0;font-size:.8rem;color:#6b7280;">Click any card to expand the full notation guide and engineering example.</p>
     </div>
-    <div class="schema-grid" id="schema-grid">
   `;
+
+  // Card grid
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem;">`;
 
   symbols.forEach((sym, idx) => {
     html += `
-      <div class="schema-card" onclick="expandSchemaCard(${idx})" id="schema-card-${idx}">
-        <div class="schema-card-label">${sym.category}</div>
-        <div class="schema-card-name">${sym.name}</div>
-        <div class="schema-card-desc">${sym.shortDesc}</div>
-      </div>
-    `;
+      <div class="schema-card" id="sc-${idx}" onclick="expandSchemaCard(${idx})"
+        style="background:#fff;border:1.5px solid #e2e4e7;border-radius:10px;overflow:hidden;cursor:pointer;
+          transition:border-color .15s,box-shadow .15s;position:relative;">
+        <!-- SVG Preview -->
+        <div style="background:#f8f9fa;border-bottom:1px solid #e2e4e7;padding:.5rem;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <div style="width:100%;max-height:160px;overflow:hidden;">
+            ${sym.svgMarkup || '<div style="text-align:center;color:#9ca3af;font-size:.75rem;font-family:JetBrains Mono,monospace">No Preview</div>'}
+          </div>
+        </div>
+        <!-- Card footer -->
+        <div style="padding:.65rem .8rem;">
+          <div style="font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#026937;margin-bottom:.2rem;">${sym.category}</div>
+          <div style="font-size:.85rem;font-weight:700;color:#1a1a1a;margin-bottom:.2rem;">${sym.name}</div>
+          <div style="font-size:.7rem;color:#6b7280;line-height:1.4;">${sym.shortDesc}</div>
+          <div style="margin-top:.5rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:#026937;display:flex;align-items:center;gap:.3rem;">
+            <span>▸ ${sym.diagramType}</span>
+            <span style="margin-left:auto;color:#d1d5db;">click to expand →</span>
+          </div>
+        </div>
+      </div>`;
   });
 
-  html += `</div><div id="schema-detail-panel" class="symbol-detail-panel" style="display:none"></div>`;
+  html += `</div>`;
+
+  // Expanded detail panel (hidden initially)
+  html += `<div id="schema-detail-panel" style="display:none;background:#fff;border:1.5px solid #026937;border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;">
+    <div id="schema-detail-content"></div>
+  </div>`;
+
   el.innerHTML = html;
-  el._symbols = symbols;
+
+  // Attach global expand function
+  window._schemaData = symbols;
 }
 
-function expandSchemaCard(idx) {
-  const el = document.getElementById('tab-schema');
-  const symbols = el._symbols;
-  const sym = symbols[idx];
+window.expandSchemaCard = function(idx) {
+  const sym = (window._schemaData || [])[idx];
+  if (!sym) return;
+
+  // Toggle — if same card clicked again, close
   const panel = document.getElementById('schema-detail-panel');
+  const prevIdx = panel.dataset.openIdx;
+  if (prevIdx == idx && panel.style.display !== 'none') {
+    panel.style.display = 'none';
+    document.querySelectorAll('.schema-card').forEach(c => c.style.borderColor = '#e2e4e7');
+    return;
+  }
 
-  document.querySelectorAll('.schema-card').forEach((c,i) => c.classList.toggle('active', i===idx));
+  // Highlight active card
+  document.querySelectorAll('.schema-card').forEach((c, i) => {
+    c.style.borderColor = i == idx ? '#026937' : '#e2e4e7';
+    c.style.boxShadow   = i == idx ? '0 0 0 2px rgba(2,105,55,.15)' : '';
+  });
 
+  panel.dataset.openIdx = idx;
   panel.style.display = 'block';
-  panel.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
-      <div>
-        <div style="font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:#026937; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:0.35rem;">${sym.category}</div>
-        <div style="font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; color:#1a1a1a;">${sym.name}</div>
+
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  document.getElementById('schema-detail-content').innerHTML = `
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+      <!-- Left: full SVG -->
+      <div style="flex:1;min-width:260px;background:#f8f9fa;border-radius:8px;padding:1rem;border:1px solid #e8eaec;display:flex;align-items:center;justify-content:center;">
+        ${sym.svgMarkup || ''}
       </div>
-      <span class="meta-chip gold">${sym.diagramType}</span>
+      <!-- Right: details -->
+      <div style="flex:1;min-width:260px;">
+        <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#026937;margin-bottom:.3rem;">${sym.category} · ${sym.diagramType}</div>
+        <h3 style="margin:0 0 .75rem;font-size:1.1rem;color:#1a1a1a;">${sym.name}</h3>
+        <p style="font-size:.8rem;color:#374151;line-height:1.7;margin-bottom:1rem;">${sym.fullDesc}</p>
+
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin-bottom:.5rem;">Notation Rules</div>
+        <ul style="margin:0 0 1rem;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:.3rem;">
+          ${(sym.notation||[]).map(n => `
+            <li style="display:flex;gap:.5rem;align-items:flex-start;font-size:.73rem;color:#374151;line-height:1.5;">
+              <span style="color:#026937;flex-shrink:0;margin-top:1px;">▸</span>${n}
+            </li>`).join('')}
+        </ul>
+
+        <div style="background:#fef9ec;border:1px solid #f6d860;border-radius:6px;padding:.7rem .9rem;">
+          <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:.3rem;">⚙ Engineering Example</div>
+          <div style="font-size:.73rem;color:#78350f;line-height:1.6;">${sym.example}</div>
+        </div>
+      </div>
     </div>
-    <p class="body-text">${sym.fullDesc}</p>
-    ${sym.svgMarkup ? `<div class="sysml-symbol-svg">${sym.svgMarkup}</div>` : ''}
-    ${sym.notation ? `
-      <div class="subsection-hdr">Notation Rules</div>
-      <ul style="list-style:none; padding:0; margin:0;">
-        ${sym.notation.map(n => `<li class="body-text" style="padding:0.3rem 0; border-bottom:1px solid #f3f4f6; display:flex; gap:0.6rem;"><span style="color:#026937;flex-shrink:0;">▸</span>${n}</li>`).join('')}
-      </ul>
-    ` : ''}
-    ${sym.example ? `
-      <div class="callout-box gold-box" style="margin-top:1rem">
-        <div class="callout-label">Engineering Example</div>
-        <div class="callout-content">${sym.example}</div>
-      </div>
-    ` : ''}
+    <button onclick="document.getElementById('schema-detail-panel').style.display='none'"
+      style="margin-top:1rem;padding:.3rem .8rem;background:#f3f4f6;border:1px solid #e2e4e7;border-radius:5px;font-size:.7rem;cursor:pointer;color:#374151;">
+      ✕ Close
+    </button>
   `;
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+};
 
 /* ─────────────────────────────────────────────────────────────────────
-   8. TAB 3 — PLAYGROUND RENDERER
+   8. TAB 3 — SYSML PLAYGROUND (Full Interactive Modeler)
    ─────────────────────────────────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────
+   8. SysML PLAYGROUND — Fully Interactive, Proper Notation
+   ─────────────────────────────────────────────────────────────────────
+   Architecture:
+   - All event listeners use addEventListener (NO inline onclick strings)
+   - Port dots wired with addEventListener after DOM insertion
+   - Delete buttons wired with addEventListener after DOM insertion  
+   - Proper SysML v2 graphical notation:
+       • part def / block: rounded rectangle, «part def» header
+       • requirement def: rectangle, amber header
+       • connection: solid line + open arrowhead
+       • composition: solid line + filled diamond at source
+       • generalization: solid line + open triangle at target
+       • dependency: dashed + open arrowhead
+   - Double-click node to edit name inline
+   - Canvas drop zone for drag-from-palette
+   - Live rubber-band connection line while connecting
+   - Real SysML colors from graphical notation spec
+   ─────────────────────────────────────────────────────────────────────*/
+
 function renderPlaygroundTab(data, lectureId) {
-  const el = document.getElementById('tab-playground');
-  const pg = data.playground || {};
+  const el  = document.getElementById('tab-playground');
+  const pg  = data.playground || {};
+  const pal = pg.palette || [];
+  const obj = pg.objectives || [];
 
   el.innerHTML = `
-    <div class="lecture-hdr" style="padding-bottom:1rem; margin-bottom:1.5rem;">
-      <div class="lecture-eyebrow">Mini SysML Playground</div>
-      <h2 class="lecture-title" style="font-size:1.6rem;">${pg.title || 'Interactive SysML Modeling'}</h2>
-      <p class="body-text" style="margin:0">${pg.instructions || 'Drag blocks, click the green port to start a connection, then click a destination block.'}</p>
+    <div class="lecture-hdr" style="padding-bottom:.75rem;margin-bottom:1rem;">
+      <div class="lecture-eyebrow">🧩 SysML Interactive Playground</div>
+      <h2 class="lecture-title" style="font-size:1.4rem;">${pg.title||'SysML Modeling Canvas'}</h2>
+      <p style="margin:0;font-size:.78rem;color:#6b7280;">${pg.instructions||'Drag from the palette · Click the green port dot to start a connection · Click destination node to finish · Click ✕ to delete'}</p>
     </div>
 
-    <div class="pg-toolbar">
-      ${(pg.palette||[]).map(b => `<button class="pg-tool-btn" onclick="addPlaygroundBlock(${JSON.stringify(b).replace(/"/g,'&quot;')}, '${lectureId}')">${b.stereotype} ${b.name}</button>`).join('')}
-      <button class="pg-tool-btn" onclick="resetPlayground('${lectureId}')">↺ Reset</button>
-      <button class="pg-tool-btn danger" onclick="clearConnections('${lectureId}')">✕ Clear Connections</button>
-    </div>
+    <div style="display:flex;gap:1rem;height:580px;">
 
-    <div id="playground-canvas-${lectureId}" class="playground-canvas" style="position:relative; width:100%; height:440px;
-      background:
-        repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px),
-        repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px),
-        #fafafa;
-      border:1px solid #e2e4e7; border-radius:8px; overflow:hidden; user-select:none;">
+      <!-- LEFT PANEL: palette + rel picker -->
+      <div style="width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:.35rem;overflow-y:auto;padding-right:4px;">
+        <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin-bottom:2px;">Element Palette</div>
+        ${pal.map(b => `
+          <div class="pg-pal-item" draggable="true"
+            data-tpl='${JSON.stringify(b).replace(/'/g,"&#39;")}'
+            data-lid="${lectureId}"
+            style="padding:.45rem .65rem;border-radius:6px;border:1.5px solid #e2e4e7;background:#fff;
+              cursor:grab;font-family:'JetBrains Mono',monospace;user-select:none;transition:all .15s;">
+            <div style="font-size:.58rem;font-weight:700;color:#026937;letter-spacing:.04em;">${b.stereotype}</div>
+            <div style="font-size:.7rem;font-weight:700;color:#1a1a1a;margin:.15rem 0;">${b.name}</div>
+            <div style="font-size:.58rem;color:#9ca3af;">${(b.props||[])[0]||''}</div>
+          </div>`).join('')}
 
-      <svg id="pg-svg-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;">
-        <defs>
-          <marker id="arrowhead-${lectureId}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <polygon points="0 0, 8 3, 0 6" fill="#026937" />
-          </marker>
-        </defs>
-        <g id="pg-connections-${lectureId}"></g>
-      </svg>
+        <div style="border-top:1px solid #e8eaec;padding-top:.5rem;margin-top:.25rem;">
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin-bottom:.35rem;">Relationship Type</div>
+          <div id="pg-relpicker-${lectureId}" style="display:flex;flex-direction:column;gap:2px;">
+            ${[
+              {id:'connection',  label:'Connection',     color:'#374151', dash:'',    tip:'Generic connection'},
+              {id:'composition', label:'◆ Composition',  color:'#026937', dash:'',    tip:'Whole owns part (filled ◆)'},
+              {id:'aggregation', label:'◇ Aggregation',  color:'#2563eb', dash:'',    tip:'Shared part (hollow ◇)'},
+              {id:'generalization',label:'▷ Generalization',color:'#7c3aed',dash:'', tip:'Subtype arrow (open ▷)'},
+              {id:'satisfy',     label:'«satisfy»',      color:'#065f46', dash:'6,3', tip:'Block satisfies requirement'},
+              {id:'verify',      label:'«verify»',       color:'#0369a1', dash:'6,3', tip:'Test verifies requirement'},
+              {id:'derive',      label:'«derive»',       color:'#c2410c', dash:'6,3', tip:'Derived requirement'},
+              {id:'include',     label:'«include»',      color:'#5b21b6', dash:'6,3', tip:'UC includes another UC'},
+              {id:'extend',      label:'«extend»',       color:'#be185d', dash:'6,3', tip:'UC conditionally extends'},
+              {id:'allocate',    label:'«allocate»',     color:'#92400e', dash:'6,3', tip:'Function allocated to block'},
+            ].map(r=>`
+              <div id="pg-rel-${r.id}-${lectureId}" data-rel="${r.id}" data-lid="${lectureId}"
+                title="${r.tip}"
+                style="padding:.28rem .5rem;border-radius:4px;border:1.5px solid transparent;cursor:pointer;
+                  font-size:.62rem;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.4rem;
+                  transition:all .12s;">
+                <svg width="22" height="10" style="flex-shrink:0">
+                  <line x1="0" y1="5" x2="20" y2="5" stroke="${r.color}" stroke-width="1.8"
+                    stroke-dasharray="${r.dash}" marker-end="url(#pg-mk-arr)"/>
+                </svg>
+                <span style="color:#374151;">${r.label}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
 
-      <div id="pg-blocks-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;"></div>
+      <!-- CANVAS -->
+      <div style="flex:1;position:relative;border-radius:10px;overflow:hidden;border:2px solid #e2e4e7;
+        background-color:#fafafa;background-image:radial-gradient(circle,#d1d5db 1px,transparent 1px);
+        background-size:20px 20px;" id="pg-canvas-${lectureId}">
 
-      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,0.9);border-top:1px solid #e2e4e7;padding:0.32rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:#9ca3af;display:flex;gap:1rem;">
-        <span id="pg-status-${lectureId}">Ready · Drag blocks to reposition · Click green port to connect</span>
-        <span style="margin-left:auto;color:#c8ccd0">Connections: <span id="pg-conn-count-${lectureId}">0</span></span>
+        <svg id="pg-svg-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:1;">
+          <defs>
+            <!-- open arrowhead (connection) -->
+            <marker id="pg-mk-arr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+              <polyline points="0,0 8,3.5 0,7" fill="none" stroke="context-stroke" stroke-width="1.3"/>
+            </marker>
+            <!-- open triangle (generalization) -->
+            <marker id="pg-mk-tri" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+              <polygon points="0,0 9,4 0,8" fill="white" stroke="context-stroke" stroke-width="1.3"/>
+            </marker>
+            <!-- filled arrowhead (solid deps) -->
+            <marker id="pg-mk-fill" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0,0 7,3 0,6" fill="context-stroke"/>
+            </marker>
+          </defs>
+          <g id="pg-connections-${lectureId}"></g>
+          <!-- Live rubber-band line while connecting -->
+          <line id="pg-temp-${lectureId}" x1="0" y1="0" x2="0" y2="0"
+            stroke="#C9A227" stroke-width="1.5" stroke-dasharray="5,3"
+            display="none" pointer-events="none"/>
+        </svg>
+
+        <div id="pg-nodes-${lectureId}" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;"></div>
+
+        <!-- Floating toolbar -->
+        <div style="position:absolute;top:8px;right:8px;z-index:20;display:flex;gap:.35rem;">
+          <button id="pg-btn-connmode-${lectureId}"
+            style="padding:.28rem .65rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;
+              border-radius:5px;border:1.5px solid #e2e4e7;background:rgba(255,255,255,.95);
+              cursor:pointer;transition:all .15s;backdrop-filter:blur(4px);">
+            🔗 Connect Mode: OFF
+          </button>
+          <button id="pg-btn-clearconn-${lectureId}"
+            style="padding:.28rem .65rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;
+              border-radius:5px;border:1.5px solid #e2e4e7;background:rgba(255,255,255,.95);cursor:pointer;">
+            ✕ Clear Lines
+          </button>
+          <button id="pg-btn-reset-${lectureId}"
+            style="padding:.28rem .65rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;
+              border-radius:5px;border:1.5px solid #e2e4e7;background:rgba(255,255,255,.95);cursor:pointer;">
+            ↺ Reset
+          </button>
+          <button id="pg-btn-export-${lectureId}"
+            style="padding:.28rem .65rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;
+              border-radius:5px;border:1.5px solid #e2e4e7;background:rgba(255,255,255,.95);cursor:pointer;">
+            ⬇ SVG
+          </button>
+        </div>
+
+        <!-- Status bar -->
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);
+          border-top:1px solid #e8eaec;padding:.22rem .7rem;font-family:'JetBrains Mono',monospace;
+          font-size:.59rem;color:#6b7280;display:flex;align-items:center;gap:.6rem;backdrop-filter:blur(4px);">
+          <span id="pg-dot-${lectureId}" style="width:6px;height:6px;border-radius:50%;background:#026937;flex-shrink:0;"></span>
+          <span id="pg-status-${lectureId}">Ready — drag elements from palette onto canvas, then connect with port dots</span>
+          <span style="margin-left:auto;color:#d1d5db;">
+            <span id="pg-nc-${lectureId}">0</span> nodes &nbsp;·&nbsp; <span id="pg-cc-${lectureId}">0</span> connections
+          </span>
+        </div>
       </div>
     </div>
 
-    ${pg.objectives ? `
-    <div class="callout-box" style="margin-top:1.25rem;">
-      <div class="callout-label">Mini-Project Objectives</div>
-      <div class="callout-content">
-        ${pg.objectives.map(o => `<div style="padding:0.2rem 0; display:flex; gap:0.5rem;"><span style="color:#026937;">▸</span>${o}</div>`).join('')}
+    <!-- Objectives -->
+    ${obj.length ? `
+    <div style="margin-top:.9rem;">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;margin-bottom:.4rem;">
+        📋 Objectives — <span id="pg-objdone-${lectureId}">0</span>/${obj.length} complete
       </div>
-    </div>
-    ` : ''}
+      <div style="display:flex;flex-direction:column;gap:.3rem;">
+        ${obj.map((o,i)=>`
+          <div id="pg-obj-${i}-${lectureId}" data-idx="${i}" data-lid="${lectureId}"
+            style="display:flex;align-items:flex-start;gap:.55rem;padding:.4rem .65rem;border-radius:6px;
+              background:#fff;border:1px solid #e8eaec;cursor:pointer;transition:all .15s;">
+            <div id="pg-objcheck-${i}-${lectureId}" style="width:16px;height:16px;border-radius:50%;
+              border:1.5px solid #d1d5db;display:flex;align-items:center;justify-content:center;
+              font-size:8px;flex-shrink:0;margin-top:1px;transition:all .2s;">✓</div>
+            <div style="font-size:.72rem;color:#374151;line-height:1.45;">${o}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
   `;
 
-  // Initialize playground state
-  if (!STATE.playgroundState[lectureId]) {
-    STATE.playgroundState[lectureId] = {
-      blocks: [], connections: [], connectingFrom: null, blockCounter: 0
-    };
-    // Pre-populate with default blocks from data
-    if (pg.defaultBlocks) {
-      pg.defaultBlocks.forEach(b => addPlaygroundBlock(b, lectureId, b.x, b.y));
+  // ── Wire up everything with addEventListener (no inline onclick) ──
+
+  const ps = _pgInit(lectureId, data);
+
+  // Palette drag
+  el.querySelectorAll('.pg-pal-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('pg-tpl', item.dataset.tpl);
+      e.dataTransfer.setData('pg-lid', item.dataset.lid);
+    });
+    item.addEventListener('click', () => {
+      const tpl = JSON.parse(item.dataset.tpl);
+      const x = 60 + (ps.nodes.length % 4) * 175;
+      const y = 50 + Math.floor(ps.nodes.length / 4) * 140;
+      pgAddNode(tpl, lectureId, x, y);
+      _pgToast(`Added ${tpl.name} — drag to reposition`);
+    });
+  });
+
+  // Canvas drop
+  const canvas = document.getElementById(`pg-canvas-${lectureId}`);
+  canvas.addEventListener('dragover', e => e.preventDefault());
+  canvas.addEventListener('drop', e => {
+    e.preventDefault();
+    const tpl = e.dataTransfer.getData('pg-tpl');
+    if (!tpl) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left - 70;
+    const y = e.clientY - rect.top - 30;
+    pgAddNode(JSON.parse(tpl), lectureId, Math.max(10,x), Math.max(10,y));
+    _pgToast('Element dropped on canvas');
+  });
+
+  // Relationship picker
+  el.querySelectorAll(`#pg-relpicker-${lectureId} [data-rel]`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      ps.relType = btn.dataset.rel;
+      _pgHighlightRel(lectureId);
+      _pgStatus(lectureId, `Relationship type: ${btn.dataset.rel} — now use Connect Mode or click port dots`,'');
+    });
+  });
+
+  // Toolbar buttons
+  document.getElementById(`pg-btn-connmode-${lectureId}`).addEventListener('click', () => _pgToggleConnMode(lectureId));
+  document.getElementById(`pg-btn-clearconn-${lectureId}`).addEventListener('click', () => {
+    ps.connections = [];
+    _pgCancelConnect(lectureId);
+    pgRedrawConnections(lectureId);
+    _pgCounts(lectureId);
+    _pgStatus(lectureId,'All connections cleared','');
+  });
+  document.getElementById(`pg-btn-reset-${lectureId}`).addEventListener('click', () => {
+    STATE.playgroundState[lectureId] = null;
+    document.getElementById(`pg-nodes-${lectureId}`).innerHTML = '';
+    const ps2 = _pgInit(lectureId, data);
+    const pg2 = data.playground || {};
+    if (pg2.defaultBlocks) pg2.defaultBlocks.forEach(b => pgAddNode(b, lectureId, b.x||80, b.y||60));
+    pgRedrawConnections(lectureId);
+    _pgToast('Canvas reset');
+  });
+  document.getElementById(`pg-btn-export-${lectureId}`).addEventListener('click', () => _pgExport(lectureId));
+
+  // Canvas mousemove for rubber-band line
+  canvas.addEventListener('mousemove', e => {
+    const ps = STATE.playgroundState[lectureId];
+    if (!ps || !ps.pendingFrom) return;
+    const rect = canvas.getBoundingClientRect();
+    const src = ps.nodes.find(n => n.id === ps.pendingFrom);
+    if (!src) return;
+    const tl = document.getElementById(`pg-temp-${lectureId}`);
+    if (!tl) return;
+    const cx = src.x + src.w/2;
+    const cy = src.y + src.h/2;
+    tl.setAttribute('x1', cx);
+    tl.setAttribute('y1', cy);
+    tl.setAttribute('x2', e.clientX - rect.left);
+    tl.setAttribute('y2', e.clientY - rect.top);
+    tl.setAttribute('display','');
+  });
+
+  // Click canvas background → cancel connect
+  canvas.addEventListener('click', e => {
+    if (e.target === canvas || e.target.id === `pg-nodes-${lectureId}` || e.target.id === `pg-svg-${lectureId}`) {
+      _pgCancelConnect(lectureId);
     }
+  });
+
+  // Objectives
+  el.querySelectorAll('[id^="pg-obj-"]').forEach(item => {
+    if (!item.dataset.idx) return;
+    item.addEventListener('click', () => _pgToggleObj(+item.dataset.idx, item.dataset.lid));
+  });
+
+  // Highlight default rel type
+  _pgHighlightRel(lectureId);
+
+  // Pre-populate defaults
+  const pg2 = data.playground || {};
+  if (ps.nodes.length === 0 && pg2.defaultBlocks) {
+    pg2.defaultBlocks.forEach(b => pgAddNode(b, lectureId, b.x||80, b.y||60));
   } else {
-    redrawPlayground(lectureId);
+    ps.nodes.forEach(n => _pgRenderNode(n, lectureId));
+    pgRedrawConnections(lectureId);
+    _pgCounts(lectureId);
+  }
+
+  // Restore obj states
+  Object.keys(ps.objDone||{}).forEach(i => {
+    if (ps.objDone[i]) _pgMarkObj(+i, lectureId, true);
+  });
+  _pgUpdateObjCount(lectureId);
+}
+
+// ── State helpers ──────────────────────────────────────────────────────
+
+function _pgInit(lid, data) {
+  if (!STATE.playgroundState[lid]) {
+    STATE.playgroundState[lid] = {
+      nodes:[], connections:[], nodeCount:0,
+      connectMode:false, pendingFrom:null,
+      relType:'connection', objDone:{}
+    };
+  }
+  return STATE.playgroundState[lid];
+}
+
+function _pgStatus(lid, msg, mode) {
+  const s = document.getElementById(`pg-status-${lid}`);
+  const d = document.getElementById(`pg-dot-${lid}`);
+  if (s) s.textContent = msg;
+  if (d) {
+    d.style.background = mode==='connect' ? '#C9A227' : '#026937';
+    d.style.animation  = mode==='connect' ? 'pulse2 .8s ease-in-out infinite' : '';
   }
 }
 
-function addPlaygroundBlock(template, lectureId, overrideX, overrideY) {
-  const ps = STATE.playgroundState[lectureId];
+function _pgCounts(lid) {
+  const ps = STATE.playgroundState[lid];
   if (!ps) return;
-  ps.blockCounter++;
-  const id = `blk-${lectureId}-${ps.blockCounter}`;
-  const canvas = document.getElementById(`playground-canvas-${lectureId}`);
-  if (!canvas) return;
-
-  const x = overrideX !== undefined ? overrideX : 60 + (ps.blocks.length % 4) * 170;
-  const y = overrideY !== undefined ? overrideY : 80 + Math.floor(ps.blocks.length / 4) * 140;
-
-  const block = { id, stereotype: template.stereotype || '«block»', name: template.name, props: template.props || [], x, y };
-  ps.blocks.push(block);
-  renderBlock(block, lectureId);
+  const nc = document.getElementById(`pg-nc-${lid}`);
+  const cc = document.getElementById(`pg-cc-${lid}`);
+  if (nc) nc.textContent = ps.nodes.length;
+  if (cc) cc.textContent = ps.connections.length;
 }
 
-function renderBlock(block, lectureId) {
-  const container = document.getElementById(`pg-blocks-${lectureId}`);
+function _pgToast(msg) {
+  let t = document.getElementById('_pg_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_pg_toast';
+    Object.assign(t.style, {
+      position:'fixed',bottom:'20px',right:'20px',zIndex:'9999',
+      background:'#026937',color:'#fff',borderRadius:'8px',padding:'.55rem .95rem',
+      fontSize:'.72rem',fontFamily:"'JetBrains Mono',monospace",
+      boxShadow:'0 4px 16px rgba(2,105,55,.3)',
+      transform:'translateY(60px)',opacity:'0',
+      transition:'transform .28s cubic-bezier(.34,1.56,.64,1),opacity .28s',
+      pointerEvents:'none',maxWidth:'260px'
+    });
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.transform = 'translateY(0)';
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>{ t.style.transform='translateY(60px)'; t.style.opacity='0'; }, 2800);
+}
+
+function _pgHighlightRel(lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  document.querySelectorAll(`#pg-relpicker-${lid} [data-rel]`).forEach(btn => {
+    const active = btn.dataset.rel === ps.relType;
+    btn.style.background   = active ? '#f0faf4' : '';
+    btn.style.borderColor  = active ? '#026937' : 'transparent';
+    btn.style.fontWeight   = active ? '700' : '';
+  });
+}
+
+// ── Add & render nodes ─────────────────────────────────────────────────
+
+function pgAddNode(tpl, lid, x, y) {
+  const ps = _pgInit(lid, null);
+  ps.nodeCount++;
+  const id = `pgn-${lid}-${ps.nodeCount}`;
+  const node = {
+    id, stereotype:tpl.stereotype||'«part def»',
+    name:tpl.name, props:tpl.props||[],
+    x:Math.max(10,x), y:Math.max(10,y),
+    w:148, h:0  // h is set after render
+  };
+  ps.nodes.push(node);
+  _pgRenderNode(node, lid);
+  _pgCounts(lid);
+}
+
+function _pgRenderNode(node, lid) {
+  const container = document.getElementById(`pg-nodes-${lid}`);
   if (!container) return;
 
-  const div = document.createElement('div');
-  div.id = block.id;
-  div.className = 'pg-block';
-  div.style.left = block.x + 'px';
-  div.style.top = block.y + 'px';
-  div.style.position = 'absolute';
-  div.style.minWidth = '145px';
-  div.style.cursor = 'grab';
-  div.style.zIndex = '2';
+  // ── SysML-accurate block appearance ──
+  // Stereotype → header color
+  const st = (node.stereotype||'').toLowerCase();
+  let hdrBg='#dbeafe', hdrColor='#1e40af';  // default: blue (part def)
+  if (st.includes('block') || st.includes('part def'))   { hdrBg='#dcfce7'; hdrColor='#14532d'; }
+  if (st.includes('require'))                              { hdrBg='#fef9c3'; hdrColor='#713f12'; }
+  if (st.includes('actor'))                                { hdrBg='#f3e8ff'; hdrColor='#581c87'; }
+  if (st.includes('usecase') || st.includes('use case'))  { hdrBg='#dbeafe'; hdrColor='#1e3a8a'; }
+  if (st.includes('constraint'))                           { hdrBg='#fce7f3'; hdrColor='#831843'; }
+  if (st.includes('test') || st.includes('tc'))           { hdrBg='#e0f2fe'; hdrColor='#0c4a6e'; }
+  if (st.includes('package') || st.includes('pkg'))       { hdrBg='#f1f5f9'; hdrColor='#1e293b'; }
+  if (st.includes('interface'))                            { hdrBg='#ecfdf5'; hdrColor='#064e3b'; }
 
+  const div = document.createElement('div');
+  div.id = node.id;
+  div.style.cssText = `position:absolute;left:${node.x}px;top:${node.y}px;
+    min-width:148px;max-width:200px;z-index:3;cursor:grab;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.09));
+    transition:filter .15s;user-select:none;`;
+
+  // Inner SysML block structure — exactly matching graphical notation spec
   div.innerHTML = `
-    <div class="pg-block-inner" id="${block.id}-inner">
-      <div class="pg-block-hdr">${block.stereotype}</div>
-      <div class="pg-block-name">${block.name}</div>
-      ${block.props.length ? `<div class="pg-block-props">${block.props.map(p=>`<div>– ${p}</div>`).join('')}</div>` : ''}
-      <div class="pg-conn-btn" title="Connect" onclick="startConnection('${block.id}','${lectureId}', event)">
-        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" stroke="#e8ddb5" stroke-width="1.5"/></svg>
+    <div class="pg-inner" style="border:1.5px solid #94a3b8;border-radius:5px;background:#fff;
+      font-family:'JetBrains Mono',monospace;overflow:hidden;position:relative;">
+      <!-- Stereotype header (top compartment) -->
+      <div class="pg-hdr" style="background:${hdrBg};padding:.18rem .5rem;text-align:center;
+        font-size:.58rem;font-weight:700;color:${hdrColor};letter-spacing:.04em;
+        border-bottom:1px solid #e2e8f0;">
+        ${node.stereotype}
       </div>
+      <!-- Name compartment -->
+      <div class="pg-name" contenteditable="true" spellcheck="false"
+        style="padding:.3rem .6rem;font-size:.78rem;font-weight:700;color:#0f172a;
+          text-align:center;border-bottom:${node.props.length?'1px solid #f1f5f9':'none'};
+          outline:none;min-width:100px;"
+        >${node.name}</div>
+      <!-- Properties compartment -->
+      ${node.props.length ? `
+        <div class="pg-props" style="padding:.22rem .55rem .3rem;">
+          ${node.props.slice(0,4).map(p=>`<div style="font-size:.6rem;color:#475569;padding:1px 0;">– ${p}</div>`).join('')}
+        </div>` : ''}
     </div>
+    <!-- Ports (connection dots on edges) — rendered outside the border div -->
+    <div class="pg-port-r" style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);
+      width:12px;height:12px;border-radius:50%;background:#026937;border:2px solid #fff;
+      cursor:crosshair;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s;"></div>
+    <div class="pg-port-l" style="position:absolute;left:-6px;top:50%;transform:translateY(-50%);
+      width:12px;height:12px;border-radius:50%;background:#026937;border:2px solid #fff;
+      cursor:crosshair;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s;"></div>
+    <div class="pg-port-b" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+      width:12px;height:12px;border-radius:50%;background:#026937;border:2px solid #fff;
+      cursor:crosshair;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s;"></div>
+    <div class="pg-port-t" style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+      width:12px;height:12px;border-radius:50%;background:#026937;border:2px solid #fff;
+      cursor:crosshair;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s;"></div>
+    <!-- Delete button -->
+    <div class="pg-del" style="position:absolute;top:-8px;left:-8px;width:18px;height:18px;
+      border-radius:50%;background:#ef4444;color:#fff;font-size:10px;font-weight:700;
+      display:none;align-items:center;justify-content:center;cursor:pointer;z-index:6;
+      border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);">✕</div>
   `;
 
-  // Drag logic
-  let isDragging = false, startX, startY, origX, origY;
+  container.appendChild(div);
+
+  // Measure real height after insert
+  node.h = div.offsetHeight || 60;
+  node.w = div.offsetWidth  || 148;
+
+  // ── WIRING: ALL via addEventListener, zero inline onclick ──
+
+  // Show/hide delete on hover
+  div.addEventListener('mouseenter', () => {
+    const del = div.querySelector('.pg-del');
+    if (del) del.style.display = 'flex';
+    div.style.filter = 'drop-shadow(0 4px 12px rgba(2,105,55,.22))';
+  });
+  div.addEventListener('mouseleave', () => {
+    const del = div.querySelector('.pg-del');
+    if (del) del.style.display = 'none';
+    div.style.filter = 'drop-shadow(0 2px 5px rgba(0,0,0,.09))';
+  });
+
+  // Port hover scale
+  div.querySelectorAll('.pg-port-r,.pg-port-l,.pg-port-b,.pg-port-t').forEach(p => {
+    p.addEventListener('mouseenter', () => {
+      p.style.transform = p.className.includes('pg-port-r') ? 'translateY(-50%) scale(1.5)' :
+                          p.className.includes('pg-port-l') ? 'translateY(-50%) scale(1.5)' :
+                          p.className.includes('pg-port-t') ? 'translateX(-50%) scale(1.5)' :
+                                                               'translateX(-50%) scale(1.5)';
+      p.style.boxShadow = '0 2px 8px rgba(2,105,55,.45)';
+    });
+    p.addEventListener('mouseleave', () => {
+      p.style.transform = p.className.includes('pg-port-r') ? 'translateY(-50%)' :
+                          p.className.includes('pg-port-l') ? 'translateY(-50%)' :
+                                                               'translateX(-50%)';
+      p.style.boxShadow = '0 1px 3px rgba(0,0,0,.25)';
+    });
+    // ★ PORT CLICK — this is the critical fix: addEventListener, not onclick string
+    p.addEventListener('click', e => {
+      e.stopPropagation();
+      _pgPortClick(node.id, lid);
+    });
+  });
+
+  // ★ DELETE BUTTON — addEventListener, not onclick string
+  const delBtn = div.querySelector('.pg-del');
+  if (delBtn) {
+    delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      _pgDeleteNode(node.id, lid);
+    });
+  }
+
+  // DRAG — full pointer tracking
+  let dragging = false, sx, sy, ox, oy;
+  const inner = div.querySelector('.pg-inner');
 
   div.addEventListener('mousedown', e => {
-    if (e.target.closest('.pg-conn-btn')) return;
-    isDragging = true;
-    startX = e.clientX; startY = e.clientY;
-    origX = block.x; origY = block.y;
+    // Don't start drag from port, delete btn, or contenteditable name
+    if (e.target.closest('.pg-port-r,.pg-port-l,.pg-port-b,.pg-port-t') ||
+        e.target.closest('.pg-del') ||
+        e.target.classList.contains('pg-name')) return;
+
+    const ps = STATE.playgroundState[lid];
+    if (ps && ps.connectMode && ps.pendingFrom && ps.pendingFrom !== node.id) {
+      _pgCompleteConnect(node.id, lid);
+      e.preventDefault();
+      return;
+    }
+    if (ps && ps.connectMode && !ps.pendingFrom) {
+      _pgStartConnect(node.id, lid);
+      e.preventDefault();
+      return;
+    }
+
+    dragging = true;
+    sx = e.clientX; sy = e.clientY;
+    ox = node.x;    oy = node.y;
     div.style.cursor = 'grabbing';
     div.style.zIndex = '20';
     e.preventDefault();
   });
 
   document.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    block.x = Math.max(0, origX + dx);
-    block.y = Math.max(0, origY + dy);
-    div.style.left = block.x + 'px';
-    div.style.top = block.y + 'px';
-    updateConnectionLines(lectureId);
+    if (!dragging) return;
+    node.x = Math.max(0, ox + e.clientX - sx);
+    node.y = Math.max(0, oy + e.clientY - sy);
+    div.style.left = node.x + 'px';
+    div.style.top  = node.y + 'px';
+    pgRedrawConnections(lid);
   });
 
   document.addEventListener('mouseup', () => {
-    if (isDragging) {
-      isDragging = false;
-      div.style.cursor = 'grab';
-      div.style.zIndex = '2';
-    }
+    if (!dragging) return;
+    dragging = false;
+    div.style.cursor = 'grab';
+    div.style.zIndex = '3';
+    node.h = div.offsetHeight;
+    node.w = div.offsetWidth;
   });
 
-  // Click to complete connection
+  // Click node body to complete connection (when in connect mode)
   div.addEventListener('click', e => {
-    if (e.target.closest('.pg-conn-btn')) return;
-    const ps = STATE.playgroundState[lectureId];
-    if (ps && ps.connectingFrom && ps.connectingFrom !== block.id) {
-      completeConnection(ps.connectingFrom, block.id, lectureId);
+    if (e.target.closest('.pg-port-r,.pg-port-l,.pg-port-b,.pg-port-t') ||
+        e.target.closest('.pg-del') ||
+        e.target.classList.contains('pg-name')) return;
+
+    const ps = STATE.playgroundState[lid];
+    if (!ps) return;
+    if (ps.connectMode) {
+      if (!ps.pendingFrom) _pgStartConnect(node.id, lid);
+      else if (ps.pendingFrom !== node.id) _pgCompleteConnect(node.id, lid);
     }
   });
 
-  container.appendChild(div);
-}
-
-function startConnection(blockId, lectureId, e) {
-  e.stopPropagation();
-  const ps = STATE.playgroundState[lectureId];
-  if (!ps) return;
-  ps.connectingFrom = blockId;
-  document.getElementById(`pg-status-${lectureId}`).textContent = `Connecting from ${blockId.split('-').slice(-1)[0]} — click a destination block`;
-  // Highlight source
-  const inner = document.getElementById(`${blockId}-inner`);
-  if (inner) inner.classList.add('selected-block');
-}
-
-function completeConnection(fromId, toId, lectureId) {
-  const ps = STATE.playgroundState[lectureId];
-  if (!ps) return;
-  // Avoid duplicates
-  if (ps.connections.find(c => c.from === fromId && c.to === toId)) {
-    cancelConnection(lectureId); return;
-  }
-  ps.connections.push({ from: fromId, to: toId, label: 'association' });
-  updateConnectionLines(lectureId);
-  document.getElementById(`pg-conn-count-${lectureId}`).textContent = ps.connections.length;
-  document.getElementById(`pg-status-${lectureId}`).textContent = `Connected · ${ps.connections.length} connection(s) established`;
-  cancelConnection(lectureId);
-}
-
-function cancelConnection(lectureId) {
-  const ps = STATE.playgroundState[lectureId];
-  if (!ps) return;
-  if (ps.connectingFrom) {
-    const inner = document.getElementById(`${ps.connectingFrom}-inner`);
-    if (inner) inner.classList.remove('selected-block');
-    ps.connectingFrom = null;
+  // Double-click name to edit inline
+  const nameDiv = div.querySelector('.pg-name');
+  if (nameDiv) {
+    nameDiv.addEventListener('blur', () => { node.name = nameDiv.textContent.trim() || node.name; });
+    nameDiv.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); nameDiv.blur(); } });
   }
 }
 
-function updateConnectionLines(lectureId) {
-  const ps = STATE.playgroundState[lectureId];
-  const svg = document.getElementById(`pg-svg-${lectureId}`);
-  if (!ps || !svg) return;
-  const g = document.getElementById(`pg-connections-${lectureId}`);
+// ── Port click handler ──────────────────────────────────────────────────
+
+function _pgPortClick(nodeId, lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+
+  // Auto-enable connect mode if not on
+  if (!ps.connectMode) {
+    ps.connectMode = true;
+    const btn = document.getElementById(`pg-btn-connmode-${lid}`);
+    if (btn) { btn.textContent = '🔗 Connect Mode: ON'; btn.style.background='#026937'; btn.style.color='#fff'; btn.style.borderColor='#026937'; }
+    const canvas = document.getElementById(`pg-canvas-${lid}`);
+    if (canvas) canvas.style.borderColor = '#C9A227';
+  }
+
+  if (!ps.pendingFrom) {
+    _pgStartConnect(nodeId, lid);
+  } else if (ps.pendingFrom !== nodeId) {
+    _pgCompleteConnect(nodeId, lid);
+  }
+}
+
+// ── Connection logic ────────────────────────────────────────────────────
+
+function _pgStartConnect(nodeId, lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  ps.pendingFrom = nodeId;
+  // Highlight source node
+  const srcDiv = document.getElementById(nodeId);
+  if (srcDiv) srcDiv.querySelector('.pg-inner').style.outline = '2px solid #C9A227';
+  const src = ps.nodes.find(n=>n.id===nodeId);
+  _pgStatus(lid, `Connecting from "${src?.name||nodeId}" → click any destination node or port to connect`, 'connect');
+}
+
+function _pgCompleteConnect(toId, lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps || !ps.pendingFrom) return;
+  const fromId = ps.pendingFrom;
+
+  // Prevent self-loop
+  if (fromId === toId) { _pgCancelConnect(lid); return; }
+
+  // Prevent duplicate
+  if (ps.connections.find(c=>c.from===fromId&&c.to===toId)) {
+    _pgCancelConnect(lid);
+    _pgStatus(lid,'Connection already exists between these nodes','');
+    return;
+  }
+
+  const REL_META = {
+    connection:    {color:'#64748b', dash:'',    marker:'arr',  label:''},
+    composition:   {color:'#15803d', dash:'',    marker:'arr',  label:'', diamond:'filled'},
+    aggregation:   {color:'#2563eb', dash:'',    marker:'arr',  label:'', diamond:'open'},
+    generalization:{color:'#7c3aed', dash:'',    marker:'tri',  label:''},
+    satisfy:       {color:'#065f46', dash:'6,3', marker:'fill', label:'«satisfy»'},
+    verify:        {color:'#0369a1', dash:'6,3', marker:'fill', label:'«verify»'},
+    derive:        {color:'#c2410c', dash:'6,3', marker:'fill', label:'«derive»'},
+    include:       {color:'#5b21b6', dash:'6,3', marker:'fill', label:'«include»'},
+    extend:        {color:'#be185d', dash:'6,3', marker:'fill', label:'«extend»'},
+    allocate:      {color:'#92400e', dash:'6,3', marker:'fill', label:'«allocate»'},
+  };
+  const meta = REL_META[ps.relType] || REL_META['connection'];
+
+  const fromNode = ps.nodes.find(n=>n.id===fromId);
+  const toNode   = ps.nodes.find(n=>n.id===toId);
+
+  ps.connections.push({ from:fromId, to:toId, ...meta });
+  pgRedrawConnections(lid);
+  _pgCounts(lid);
+  _pgCancelConnect(lid);
+
+  const msg = `✓ ${fromNode?.name} → ${toNode?.name} [${ps.relType}]`;
+  _pgStatus(lid, msg, '');
+  _pgToast(msg);
+  _pgAutoCheckObj(lid);
+}
+
+function _pgCancelConnect(lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  if (ps.pendingFrom) {
+    const srcDiv = document.getElementById(ps.pendingFrom);
+    if (srcDiv) { const inner = srcDiv.querySelector('.pg-inner'); if(inner) inner.style.outline=''; }
+    ps.pendingFrom = null;
+  }
+  const tl = document.getElementById(`pg-temp-${lid}`);
+  if (tl) tl.setAttribute('display','none');
+}
+
+function _pgToggleConnMode(lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  ps.connectMode = !ps.connectMode;
+  const btn    = document.getElementById(`pg-btn-connmode-${lid}`);
+  const canvas = document.getElementById(`pg-canvas-${lid}`);
+  if (ps.connectMode) {
+    if (btn) { btn.textContent='🔗 Connect Mode: ON'; btn.style.cssText+='background:#026937;color:#fff;border-color:#026937;'; }
+    if (canvas) canvas.style.borderColor='#C9A227';
+    _pgStatus(lid, `Connect Mode ON — click source node body or port dot, then click destination · Rel: ${ps.relType}`, 'connect');
+  } else {
+    _pgCancelConnect(lid);
+    if (btn) { btn.textContent='🔗 Connect Mode: OFF'; btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
+    if (canvas) canvas.style.borderColor='#e2e4e7';
+    _pgStatus(lid,'Connect Mode OFF','');
+  }
+}
+
+function _pgDeleteNode(nodeId, lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  if (ps.pendingFrom === nodeId) _pgCancelConnect(lid);
+  ps.nodes = ps.nodes.filter(n=>n.id!==nodeId);
+  ps.connections = ps.connections.filter(c=>c.from!==nodeId&&c.to!==nodeId);
+  const div = document.getElementById(nodeId);
+  if (div) div.remove();
+  pgRedrawConnections(lid);
+  _pgCounts(lid);
+  _pgStatus(lid,'Node deleted','');
+  _pgToast('Node deleted');
+}
+
+// ── Draw connections (proper SysML notation) ────────────────────────────
+
+function pgRedrawConnections(lid) {
+  const ps = STATE.playgroundState[lid];
+  const g  = document.getElementById(`pg-connections-${lid}`);
+  if (!ps || !g) return;
   g.innerHTML = '';
 
   ps.connections.forEach(conn => {
-    const fb = ps.blocks.find(b => b.id === conn.from);
-    const tb = ps.blocks.find(b => b.id === conn.to);
-    if (!fb || !tb) return;
+    const fn = ps.nodes.find(n=>n.id===conn.from);
+    const tn = ps.nodes.find(n=>n.id===conn.to);
+    if (!fn||!tn) return;
 
-    const fw = 145, fh = 60;
-    const x1 = fb.x + fw;
-    const y1 = fb.y + fh / 2;
-    const x2 = tb.x;
-    const y2 = tb.y + fh / 2;
-    const mx = (x1 + x2) / 2;
+    // Center-to-center anchor points
+    const x1 = fn.x + (fn.w||148)/2,  y1 = fn.y + (fn.h||60)/2;
+    const x2 = tn.x + (tn.w||148)/2,  y2 = tn.y + (tn.h||60)/2;
 
+    // Edge intersection (clip to block border)
+    const {ex1,ey1,ex2,ey2} = _pgEdgePoints(fn,tn);
+
+    const dx = x2-x1, dy = y2-y1;
+    const mx = (ex1+ex2)/2, my = (ey1+ey2)/2;
+
+    // ── Path (bezier) ──
     const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d', `M ${x1},${y1} C ${mx},${y1} ${mx},${y2} ${x2},${y2}`);
-    path.setAttribute('stroke', '#026937');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-dasharray', '5,3');
-    path.setAttribute('marker-end', `url(#arrowhead-${lectureId})`);
+    const cpx  = mx, cpy = my;
+    const bend = Math.min(40, Math.abs(dx)*0.3);
+    path.setAttribute('d', `M${ex1},${ey1} C${ex1+bend},${ey1} ${ex2-bend},${ey2} ${ex2},${ey2}`);
+    path.setAttribute('stroke', conn.color);
+    path.setAttribute('stroke-width','1.8');
+    path.setAttribute('fill','none');
+    if (conn.dash) path.setAttribute('stroke-dasharray', conn.dash);
+    // marker
+    if (conn.marker==='tri') path.setAttribute('marker-end', 'url(#pg-mk-tri)');
+    else if (conn.marker==='fill') path.setAttribute('marker-end','url(#pg-mk-fill)');
+    else path.setAttribute('marker-end','url(#pg-mk-arr)');
     g.appendChild(path);
 
-    // Label
-    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-    text.setAttribute('x', mx);
-    text.setAttribute('y', Math.min(y1,y2) - 6);
-    text.setAttribute('fill', '#9ca3af');
-    text.setAttribute('font-size', '9');
-    text.setAttribute('font-family', 'JetBrains Mono, monospace');
-    text.setAttribute('text-anchor', 'middle');
-    text.textContent = conn.label;
-    g.appendChild(text);
+    // ── Composition / aggregation diamond at SOURCE ──
+    if (conn.diamond) {
+      const ang = Math.atan2(ey1-y1, ex1-x1);
+      const dx2 = Math.cos(ang), dy2 = Math.sin(ang);
+      const dm = 8;
+      const pts = [
+        [ex1, ey1],
+        [ex1 - dm*dx2 + dm/2*-dy2, ey1 - dm*dy2 + dm/2*dx2],
+        [ex1 - dm*2*dx2,            ey1 - dm*2*dy2],
+        [ex1 - dm*dx2 - dm/2*-dy2, ey1 - dm*dy2 - dm/2*dx2],
+      ].map(p=>p.join(',')).join(' ');
+      const dia = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      dia.setAttribute('points', pts);
+      dia.setAttribute('fill',   conn.diamond==='filled' ? conn.color : 'white');
+      dia.setAttribute('stroke', conn.color);
+      dia.setAttribute('stroke-width','1.2');
+      g.appendChild(dia);
+    }
+
+    // ── Relationship label ──
+    if (conn.label) {
+      const lx = (ex1+ex2)/2, ly = (ey1+ey2)/2 - 10;
+      const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      const tw = conn.label.length * 5.5 + 8;
+      bg.setAttribute('x', lx-tw/2); bg.setAttribute('y', ly-8);
+      bg.setAttribute('width',tw); bg.setAttribute('height',14);
+      bg.setAttribute('rx',3); bg.setAttribute('fill','rgba(255,255,255,.92)');
+      bg.setAttribute('stroke',conn.color); bg.setAttribute('stroke-width','.5');
+      g.appendChild(bg);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x',lx); txt.setAttribute('y',ly+2);
+      txt.setAttribute('fill',conn.color); txt.setAttribute('font-size','8.5');
+      txt.setAttribute('font-family',"'JetBrains Mono',monospace");
+      txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-weight','600');
+      txt.textContent = conn.label;
+      g.appendChild(txt);
+    }
   });
 }
 
-function redrawPlayground(lectureId) {
-  const ps = STATE.playgroundState[lectureId];
-  if (!ps) return;
-  const container = document.getElementById(`pg-blocks-${lectureId}`);
-  if (!container) return;
-  container.innerHTML = '';
-  ps.blocks.forEach(b => renderBlock(b, lectureId));
-  updateConnectionLines(lectureId);
-  document.getElementById(`pg-conn-count-${lectureId}`).textContent = ps.connections.length;
+// Compute exact edge intersection points for cleaner connection lines
+function _pgEdgePoints(fn, tn) {
+  const fw = fn.w||148, fh = fn.h||60;
+  const tw = tn.w||148, th = tn.h||60;
+  const fx = fn.x+fw/2, fy = fn.y+fh/2;
+  const tx = tn.x+tw/2, ty = tn.y+th/2;
+  const dx = tx-fx, dy = ty-fy;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  const ux = dx/len, uy = dy/len;
+  // Exit point from source block
+  const sx = Math.min(fw/2, Math.abs(dy)>0 ? (fh/2)*Math.abs(dx/dy) : fw/2);
+  const sy = Math.min(fh/2, Math.abs(dx)>0 ? (fw/2)*Math.abs(dy/dx) : fh/2);
+  const ex1 = fx + Math.sign(dx)*Math.min(sx,fw/2);
+  const ey1 = fy + Math.sign(dy)*Math.min(sy,fh/2);
+  // Entry point to target block
+  const tx2 = Math.min(tw/2, Math.abs(dy)>0 ? (th/2)*Math.abs(dx/dy) : tw/2);
+  const ty2 = Math.min(th/2, Math.abs(dx)>0 ? (tw/2)*Math.abs(dy/dx) : th/2);
+  const ex2 = tx - Math.sign(dx)*Math.min(tx2,tw/2);
+  const ey2 = ty - Math.sign(dy)*Math.min(ty2,th/2);
+  return {ex1,ey1,ex2,ey2};
 }
 
-function resetPlayground(lectureId) {
-  STATE.playgroundState[lectureId] = { blocks: [], connections: [], connectingFrom: null, blockCounter: 0 };
+// ── Objectives ──────────────────────────────────────────────────────────
+
+function _pgToggleObj(idx, lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  ps.objDone[idx] = !ps.objDone[idx];
+  _pgMarkObj(idx, lid, ps.objDone[idx]);
+  _pgUpdateObjCount(lid);
+  if (ps.objDone[idx]) _pgToast(`✓ Objective ${idx+1} marked complete!`);
+}
+
+function _pgMarkObj(idx, lid, done) {
+  const item  = document.getElementById(`pg-obj-${idx}-${lid}`);
+  const check = document.getElementById(`pg-objcheck-${idx}-${lid}`);
+  if (!item || !check) return;
+  item.style.background   = done ? '#f0faf4' : '#fff';
+  item.style.borderColor  = done ? '#a7d4b8' : '#e8eaec';
+  check.style.background  = done ? '#026937' : '';
+  check.style.borderColor = done ? '#026937' : '#d1d5db';
+  check.style.color       = done ? '#fff' : '#d1d5db';
+}
+
+function _pgUpdateObjCount(lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
+  const el = document.getElementById(`pg-objdone-${lid}`);
+  if (el) el.textContent = Object.values(ps.objDone||{}).filter(Boolean).length;
+}
+
+function _pgAutoCheckObj(lid) {
+  const ps = STATE.playgroundState[lid];
+  if (!ps) return;
   const data = window.MBSE_COURSE_DATA[STATE.activeLectureId];
-  if (data && data.playground && data.playground.defaultBlocks) {
-    data.playground.defaultBlocks.forEach(b => addPlaygroundBlock(b, lectureId, b.x, b.y));
+  const objs = data?.playground?.objectives || [];
+  const first = objs.findIndex((_,i)=>!ps.objDone[i]);
+  if (first>=0 && ps.connections.length>0 && !ps.objDone[first]) {
+    ps.objDone[first] = true;
+    _pgMarkObj(first, lid, true);
+    _pgUpdateObjCount(lid);
   }
-  updateConnectionLines(lectureId);
-  document.getElementById(`pg-conn-count-${lectureId}`).textContent = '0';
-  document.getElementById(`pg-status-${lectureId}`).textContent = 'Reset · Drag blocks to reposition';
 }
 
-function clearConnections(lectureId) {
-  const ps = STATE.playgroundState[lectureId];
-  if (!ps) return;
-  ps.connections = [];
-  ps.connectingFrom = null;
-  updateConnectionLines(lectureId);
-  document.getElementById(`pg-conn-count-${lectureId}`).textContent = '0';
-  document.getElementById(`pg-status-${lectureId}`).textContent = 'Connections cleared';
+// ── SVG Export ────────────────────────────────────────────────────────
+
+function _pgExport(lid) {
+  const ps = STATE.playgroundState[lid];
+  const canvas = document.getElementById(`pg-canvas-${lid}`);
+  if (!ps||!canvas) return;
+
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  let svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  svgStr += `<rect width="${W}" height="${H}" fill="#fafafa"/>`;
+  svgStr += `<defs>
+    <marker id="mk-arr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polyline points="0,0 8,3.5 0,7" fill="none" stroke="#64748b" stroke-width="1.3"/>
+    </marker>
+    <marker id="mk-tri" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0,0 9,4 0,8" fill="white" stroke="#7c3aed" stroke-width="1.3"/>
+    </marker>
+    <marker id="mk-fill" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0,0 7,3 0,6" fill="#475569"/>
+    </marker>
+  </defs>`;
+
+  // Connections
+  ps.connections.forEach(c=>{
+    const fn=ps.nodes.find(n=>n.id===c.from), tn=ps.nodes.find(n=>n.id===c.to);
+    if(!fn||!tn) return;
+    const {ex1,ey1,ex2,ey2}=_pgEdgePoints(fn,tn);
+    const mk = c.marker==='tri'?'url(#mk-tri)':c.marker==='fill'?'url(#mk-fill)':'url(#mk-arr)';
+    svgStr+=`<path d="M${ex1},${ey1} L${ex2},${ey2}" stroke="${c.color}" stroke-width="1.8" fill="none" ${c.dash?`stroke-dasharray="${c.dash}"`:''}  marker-end="${mk}"/>`;
+    if(c.label){const lx=(ex1+ex2)/2,ly=(ey1+ey2)/2-10;svgStr+=`<text x="${lx}" y="${ly}" font-size="8" font-family="monospace" fill="${c.color}" text-anchor="middle" font-weight="600">${c.label}</text>`;}
+  });
+
+  // Nodes
+  ps.nodes.forEach(n=>{
+    const st=(n.stereotype||'').toLowerCase();
+    let hb='#dbeafe',hc='#1e40af';
+    if(st.includes('block')||st.includes('part def')){hb='#dcfce7';hc='#14532d';}
+    if(st.includes('require')){hb='#fef9c3';hc='#713f12';}
+    const w=n.w||148,h=n.h||60;
+    svgStr+=`<rect x="${n.x}" y="${n.y}" width="${w}" height="${h}" rx="5" fill="white" stroke="#94a3b8" stroke-width="1.5"/>`;
+    svgStr+=`<rect x="${n.x}" y="${n.y}" width="${w}" height="18" rx="5" fill="${hb}"/>`;
+    svgStr+=`<rect x="${n.x}" y="${n.y+10}" width="${w}" height="8" fill="${hb}"/>`;
+    svgStr+=`<text x="${n.x+w/2}" y="${n.y+13}" font-size="8" font-family="monospace" fill="${hc}" text-anchor="middle" font-weight="700">${n.stereotype}</text>`;
+    svgStr+=`<line x1="${n.x}" y1="${n.y+18}" x2="${n.x+w}" y2="${n.y+18}" stroke="#e2e8f0" stroke-width="1"/>`;
+    svgStr+=`<text x="${n.x+w/2}" y="${n.y+32}" font-size="10" font-family="monospace" fill="#0f172a" text-anchor="middle" font-weight="700">${n.name}</text>`;
+  });
+
+  svgStr += `</svg>`;
+  const blob = new Blob([svgStr],{type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=`sysml-L${lid}.svg`; a.click();
+  _pgToast('⬇ SVG exported!');
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   9. TAB 4 — QUIZ RENDERER
-   ─────────────────────────────────────────────────────────────────────*/
+// Keep old global names as aliases for backward compat
+window.pgAddNode = pgAddNode;
+window.pgRedrawConnections = pgRedrawConnections;
+
 function renderQuizTab(data, lectureId) {
   const el = document.getElementById('tab-quiz');
   const questions = (data.quiz || {}).questions || [];

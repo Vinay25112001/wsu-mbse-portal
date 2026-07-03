@@ -17,7 +17,7 @@ references:[
   'RTCA DO-178C. (2011). Software Considerations in Airborne Systems and Equipment Certification.',
   'Systems-Modeling Organization. (2026). OMG SysML v2 Release Repository [Software]. GitHub. https://github.com/Systems-Modeling/SysML-v2-Release (Includes KerML 1.0, SysML 2.0, and API 1.0 specification documents, normative model libraries, and Eclipse/Jupyter installer packages. Formally adopted by OMG 30 June 2025; updated for ISO submission March 2026.)',
   'Systems-Modeling Organization. (2026). SysML v2 Pilot Implementation [Software, EPL-2.0]. GitHub. https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation (Eclipse Xtext-based reference implementation of the SysML v2 textual notation; includes Jupyter kernel for SysML v2, PlantUML visualization integration, and 85 tagged releases through 2026-04.)'
-],
+,'Systems-Modeling Organization. (2026). SysML v2 Library for AADL — domain extension enabling AADL v2 concepts (threads, processes, event ports, data ports) within SysML v2 for real-time embedded and safety-critical systems. Directly applicable to eVTOL flight control computer modeling. https://github.com/Systems-Modeling/SysML-v2-AADL-Release','OMG RTESC Working Group. (2026). Architecture Analysis and Design Language Extension for SysML v2 — joint OMG-SAE initiative for DO-178C avionics software architecture modeling. https://github.com/Systems-Modeling/SysML-v2-AADL-Release'],
 schemaVisualizer:[{
 category:'Lecture 26',name:'Hybrid eVTOL Tilt-Rotor Architecture Case Study — Part II',diagramType:'Cross-Pillar View',
 shortDesc:'Key SysML diagram types for Hybrid eVTOL Tilt-Rotor Architecture Case Study — Part II — extend the AWRF model from prior lectures.',
